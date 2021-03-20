@@ -1,3 +1,4 @@
+#pragma once
 #include <napi.h>
 #include <libdivecomputer/device.h>
 
@@ -19,3 +20,4 @@
 Napi::Object getAllEventTypes(Napi::Env);
 unsigned int translateEvents(Napi::Env, Napi::Array);
 dc_event_type_t translateEvent(Napi::Env, Napi::String);
+const char *translateEvent(Napi::Env, dc_event_type_t event);

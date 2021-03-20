@@ -1,3 +1,4 @@
+#pragma once
 #include <napi.h>
 #include <libdivecomputer/parser.h>
 

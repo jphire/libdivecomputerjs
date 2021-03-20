@@ -49,7 +49,8 @@ describe('descriptors', () => {
     it('retrieves transports', () => {
         const eonSteel = getEonSteel();
 
-        const transports = eonSteel.transports;
+        const transports = eonSteel!.transports;
+
         expect(transports).to.includes(Transport.USBHID);
     });
 });

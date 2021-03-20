@@ -8,6 +8,7 @@
     "configure": "cmake-js configure",
     "build": "cmake-js build",
     "test": "mocha --require ./tshook.js --recursive  'test/**/*.spec.ts'",
+    "sample": "ts-node test/download-eonsteel.ts",
     "all": "yarn configure && yarn build && yarn test",
     "clean": "cmake-js clean"
   },

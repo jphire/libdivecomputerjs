@@ -125,12 +125,14 @@ void Device::setFingerprint(const Napi::CallbackInfo &info)
 
 void Device::setEvents(const Napi::CallbackInfo &info)
 {
-    if (info.Length() != 2 || !info[0].IsNumber() || !info[1].IsFunction())
+    if (info.Length() != 2 || !info[0].IsArray() || !info[1].IsFunction())
     {
         throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {number} and {function}.");
     }
 
-    auto events = info[0].ToNumber().Uint32Value();
+    auto eventsArray = info[0].As<Napi::Array>();
+    auto events = translateEvents(info.Env(), eventsArray);
+
     eventCallback = Napi::Persistent(info[1].As<Napi::Function>());
 
     dc_device_set_events(device, events, nativeEventCallback, this);
@@ -172,46 +174,45 @@ Napi::Value wrapDevInfoEventData(Napi::Env env, const dc_event_devinfo_t *devinf
     return progressObject;
 }
 
+Napi::Value wrapEventData(Napi::Env env, dc_event_type_t event, const void *data)
+{
+    auto eventObject = Napi::Object::New(env);
+    switch (event)
+    {
+    case DC_EVENT_CLOCK:
+        return wrapClockEventData(env, reinterpret_cast<const dc_event_clock_t *>(data));
+
+    case DC_EVENT_PROGRESS:
+        return wrapProgressEventData(env, reinterpret_cast<const dc_event_progress_t *>(data));
+
+    case DC_EVENT_WAITING:
+        return env.Undefined();
+
+    case DC_EVENT_VENDOR:
+        return wrapVendorEventData(env, reinterpret_cast<const dc_event_vendor_t *>(data));
+
+    case DC_EVENT_DEVINFO:
+        return wrapDevInfoEventData(env, reinterpret_cast<const dc_event_devinfo_t *>(data));
+    }
+
+    char buffer[128];
+    sprintf(buffer, "Invalid event type %u", event);
+    throw Napi::TypeError::New(env, buffer);
+}
+
+Napi::Object wrapEvent(Napi::Env env, dc_event_type_t event, const void *data)
+{
+    auto eventObject = Napi::Object::New(env);
+    eventObject.Set("type", translateEvent(env, event));
+    eventObject.Set("data", wrapEventData(env, event, data));
+    return eventObject;
+}
+
 void Device::nativeEventCallback(dc_device_t *d, dc_event_type_t event, const void *data, void *userdata)
 {
     auto device = (Device *)userdata;
     auto env = device->Env();
 
-    switch (event)
-    {
-    case DC_EVENT_CLOCK:
-        device->eventCallback.Call({
-            Napi::String::New(env, EVENT_CLOCK),
-            wrapClockEventData(env, reinterpret_cast<const dc_event_clock_t *>(data)),
-        });
-        break;
-
-    case DC_EVENT_PROGRESS:
-        device->eventCallback.Call({
-            Napi::String::New(env, EVENT_PROGRESS),
-            wrapProgressEventData(env, reinterpret_cast<const dc_event_progress_t *>(data)),
-        });
-        break;
-
-    case DC_EVENT_WAITING:
-        device->eventCallback.Call({
-            Napi::String::New(env, EVENT_WAITING),
-        });
-        break;
-
-    case DC_EVENT_VENDOR:
-        device->eventCallback.Call({
-            Napi::String::New(env, EVENT_VENDOR),
-            wrapVendorEventData(env, reinterpret_cast<const dc_event_vendor_t *>(data)),
-        });
-        break;
-
-    case DC_EVENT_DEVINFO:
-        auto devinfoData = (dc_event_devinfo_t *)data;
-        device->eventCallback.Call({
-            Napi::String::New(env, EVENT_DEVINFO),
-            wrapDevInfoEventData(env, reinterpret_cast<const dc_event_devinfo_t *>(data)),
-        });
-        break;
-    }
+    auto eventData = wrapEvent(device->Env(), event, data);
+    device->eventCallback.Call({eventData});
 }

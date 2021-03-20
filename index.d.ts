@@ -61,6 +61,52 @@ declare module 'libdivecomputer' {
         Salt,
     }
 
+    export enum SampleType {
+        Bearing,
+        CNS,
+        Deco,
+        Depth,
+        Event,
+        Gasmix,
+        Heartbeat,
+        PPO2,
+        Pressure,
+        RBT,
+        Setpoint,
+        Temperature,
+        Time,
+        Vendor,
+    }
+
+    export enum SampleEventType {
+        None,
+        Deco,
+        RBT,
+        Ascent,
+        Ceiling,
+        Workload,
+        Transmitter,
+        Violation,
+        Bookmark,
+        Surface,
+        SafetyStop,
+        Gaschange,
+        SafetyStopVoluntary,
+        SafetyStopMandatory,
+        Deepstop,
+        CeilingSafetyStop,
+        Floor,
+        Divetime,
+        Maxdepth,
+        OLF,
+        PO2,
+        Airtime,
+        RGBM,
+        Heading,
+        TissueLevelWarning,
+        Gaschange2,
+    }
+
     export class Descriptor {
         static iterate(): Iterable<Descriptor>;
         readonly product: string;
@@ -69,32 +115,48 @@ declare module 'libdivecomputer' {
         readonly transports: Transports[];
     }
 
-    export class USBHIDDevice {
-        static iterate(): Iterable<USBHIDDevice>;
+    export class USBHIDTransport {
+        static iterate(
+            context: Context,
+            descriptor: Descriptor
+        ): Iterable<USBHIDTransport>;
         readonly pid: number;
         readonly vid: number;
+        open(context: Context): IOStream;
         toString(): string;
-        open(): IOStream;
     }
-    export class SerialDevice {
-        static iterate(): Iterable<SerialDevice>;
+
+    export class SerialTransport {
+        static iterate(
+            context: Context,
+            descriptor: Descriptor
+        ): Iterable<SerialTransport>;
         readonly name: string;
+        open(context: Context): IOStream;
         toString(): string;
-        open(): IOStream;
     }
-    export class IRDADevice {
-        static iterate(): Iterable<SerialDevice>;
+
+    export class IRDATransport {
+        static iterate(
+            context: Context,
+            descriptor: Descriptor
+        ): Iterable<IRDATransport>;
         readonly name: string;
         readonly address: string;
+        open(context: Context): IOStream;
         toString(): string;
-        open(): IOStream;
     }
-    export class BluetoothDevice {
-        static iterate(): Iterable<SerialDevice>;
+
+    export class BluetoothTranport {
+        static iterate(
+            context: Context,
+            descriptor: Descriptor
+        ): Iterable<BluetoothTranport>;
         readonly name: string;
+        open(context: Context): IOStream;
         toString(): string;
-        open(): IOStream;
     }
+
     class IOStream {}
 
     type EventData<T extends EventType, D extends object> = {
@@ -113,8 +175,20 @@ declare module 'libdivecomputer' {
     type EventCallback = (args: EventsData) => void;
 
     export class Device {
+        constructor(
+            context: Context,
+            descriptor: Descriptor,
+            iostream: IOStream
+        );
         setFingerprint(data: ArrayBuffer): void;
         setEvents(events: EventType[], callback: EventCallback): void;
+        setCancel(callback: () => boolean): void;
+        foreach(
+            callback: (
+                diveData: ArrayBuffer,
+                fingerprint: ArrayBuffer
+            ) => void | boolean
+        ): void;
     }
 
     export class Context {
@@ -122,6 +196,64 @@ declare module 'libdivecomputer' {
         readonly transports: Transports[];
         log(logLevel: LogLevel, message: string);
         onLog(cb: (logLevel: LogLevel, message: string) => void);
+    }
+
+    type SampleInstance<T extends SampleType, K> = {
+        type: T;
+        value: K;
+    };
+    type Sample =
+        | SampleInstance<
+              | SampleType.Bearing
+              | SampleType.CNS
+              | SampleType.Depth
+              | SampleType.Gasmix
+              | SampleType.Heartbeat
+              | SampleType.PPO2
+              | SampleType.RBT
+              | SampleType.Setpoint
+              | SampleType.Temperature
+              | SampleType.Time,
+              number
+          >
+        | SampleInstance<SampleType.Vendor, { type: number; data: ArrayBuffer }>
+        | SampleInstance<SampleType.Pressure, { tank: number; value: number }>
+        | SampleInstance<
+              SampleType.Deco,
+              { depth: number; time: number; type: number }
+          >;
+
+    type NumbericFields =
+        | FieldType.Atmospheric
+        | FieldType.AverageDepth
+        | FieldType.MaxDepth
+        | FieldType.TemperatureSurface
+        | FieldType.TemperatureMinimum
+        | FieldType.TemperatureMaximum
+        | FieldType.DiveTime
+        | FieldType.TankCount
+        | FieldType.GasMixCount;
+
+    type TankValue = {
+        type: TankVolume;
+        beginPressure: number;
+        endPressure: number;
+        workingPressure: number;
+        volume: number;
+        gasmix: number;
+    };
+    export class Parser {
+        setData(data: ArrayBuffer): void;
+        getField(field: NumbericFields): number;
+        getField(field: FieldType.DiveMode): DiveMode;
+        getField(
+            field: FieldType.Salinity
+        ): { density: number; type: WaterType };
+        getField(field: FieldType.Tank): TankValue;
+        getField(
+            field: FieldType.GasMix
+        ): { helium: number; oxygen: number; nitrogen: number };
+        samplesForeach(callback: (sample: Sample) => void): void;
     }
 
     export function version(): string;

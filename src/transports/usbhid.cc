@@ -91,9 +91,9 @@ Napi::Value USBHIDTransport::getPid(const Napi::CallbackInfo &info)
 Napi::Value USBHIDTransport::open(const Napi::CallbackInfo &info)
 {
 
-    if (info.Length() != 1 || info[0].IsObject())
+    if (info.Length() != 1 || !info[0].IsObject())
     {
-        throw Napi::TypeError::New(info.Env(), "Invalid argument,  expected {context}.");
+        throw Napi::TypeError::New(info.Env(), "Invalid argument, expected {context}.");
     }
 
     auto context = Napi::ObjectWrap<Context>::Unwrap(info[0].As<Napi::Object>());

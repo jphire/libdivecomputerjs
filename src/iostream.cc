@@ -14,7 +14,7 @@ void IOStream::Init(Napi::Env env, Napi::Object exports)
 IOStream::IOStream(const Napi::CallbackInfo &info)
     : Napi::ObjectWrap<IOStream>(info)
 {
-    if (!info.Length() != 2 || !info[0].IsExternal())
+    if (info.Length() != 1 || !info[0].IsExternal())
     {
         throw Napi::TypeError::New(info.Env(), "Unable to construct IOStream. Transports are created by calling your transport type's open method (eg. USBHIDTransport.open())");
     }

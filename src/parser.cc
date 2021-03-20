@@ -3,9 +3,25 @@
 #include "device.h"
 #include "errors/DCError.h"
 #include "enums/fieldtypes.h"
+#include "enums/sampletypes.h"
 #include "enums/fieldvalues/divemode.h"
 #include "enums/fieldvalues/tankvolume.h"
 #include "enums/fieldvalues/watertype.h"
+#include "enums/samplevalues/eventsampletype.h"
+
+void Parser::Init(Napi::Env env, Napi::Object exports)
+{
+    Napi::Function func = DefineClass(
+        env,
+        "Parser",
+        {
+            InstanceAccessor<&Parser::setData>("setData"),
+            InstanceAccessor<&Parser::getField>("getField"),
+            InstanceAccessor<&Parser::samplesForeach>("samplesForeach"),
+        });
+
+    exports.Set("Parser", func);
+}
 
 Parser::Parser(const Napi::CallbackInfo &info)
     : Napi::ObjectWrap<Parser>(info)
@@ -30,7 +46,7 @@ Parser::~Parser()
     }
 }
 
-void Parser::setData(const Napi::CallbackInfo &info)
+Napi::Value Parser::setData(const Napi::CallbackInfo &info)
 {
     if (info.Length() == 1 && info[0].IsArrayBuffer())
     {
@@ -41,6 +57,8 @@ void Parser::setData(const Napi::CallbackInfo &info)
 
     auto status = dc_parser_set_data(parser, reinterpret_cast<unsigned char *>(data.Data()), data.ByteLength());
     DCError::AssertSuccess(info.Env(), status);
+
+    return info.Env().Undefined();
 }
 
 Napi::Object wrapTank(Napi::Env env, dc_tank_t &tank)
@@ -169,4 +187,109 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
     }
 
     throw Napi::TypeError::New(env, "Unsupported dc field type");
+}
+
+Napi::Object wrapDecoSample(Napi::Env env, dc_sample_value_t value)
+{
+    auto deco = Napi::Object::New(env);
+    deco.Set("depth", value.deco.depth);
+    deco.Set("time", value.deco.time);
+    deco.Set("type", value.deco.type);
+    return deco;
+}
+
+Napi::Object wrapEventSample(Napi::Env env, dc_sample_value_t value)
+{
+    auto event = Napi::Object::New(env);
+    event.Set("time", value.event.time);
+    event.Set("flags", value.event.flags);
+    event.Set("type", translateSampleEventType(value.event.type));
+    event.Set("value", value.event.value);
+    return event;
+}
+
+Napi::Object wrapPressureSample(Napi::Env env, dc_sample_value_t value)
+{
+    auto pressure = Napi::Object::New(env);
+    pressure.Set("tank", value.pressure.tank);
+    pressure.Set("value", value.pressure.value);
+    return pressure;
+}
+
+Napi::Object wrapVendorSample(Napi::Env env, dc_sample_value_t value)
+{
+    auto vendor = Napi::Object::New(env);
+    vendor.Set("type", value.vendor.type);
+    vendor.Set("data", Napi::ArrayBuffer::New(env, (void *)value.vendor.data, value.vendor.size));
+    return vendor;
+}
+
+Napi::Value getSampleValue(Napi::Env env, dc_sample_type_t type, dc_sample_value_t value)
+{
+    switch (type)
+    {
+    case DC_SAMPLE_BEARING:
+        return Napi::Number::New(env, value.bearing);
+    case DC_SAMPLE_CNS:
+        return Napi::Number::New(env, value.cns);
+    case DC_SAMPLE_DECO:
+        return wrapDecoSample(env, value);
+    case DC_SAMPLE_DEPTH:
+        return Napi::Number::New(env, value.depth);
+    case DC_SAMPLE_EVENT:
+        return wrapEventSample(env, value);
+    case DC_SAMPLE_GASMIX:
+        return Napi::Number::New(env, value.gasmix);
+    case DC_SAMPLE_HEARTBEAT:
+        return Napi::Number::New(env, value.heartbeat);
+    case DC_SAMPLE_PPO2:
+        return Napi::Number::New(env, value.ppo2);
+    case DC_SAMPLE_PRESSURE:
+        return wrapPressureSample(env, value);
+    case DC_SAMPLE_RBT:
+        return Napi::Number::New(env, value.rbt);
+    case DC_SAMPLE_SETPOINT:
+        return Napi::Number::New(env, value.setpoint);
+    case DC_SAMPLE_TEMPERATURE:
+        return Napi::Number::New(env, value.temperature);
+    case DC_SAMPLE_TIME:
+        return Napi::Number::New(env, value.time);
+    case DC_SAMPLE_VENDOR:
+        return wrapVendorSample(env, value);
+    }
+
+    throw Napi::TypeError::New(env, "Unsupported dc sample ");
+}
+
+Napi::Object wrapSample(Napi::Env env, dc_sample_type_t type, dc_sample_value_t value)
+{
+    auto obj = Napi::Object::New(env);
+
+    obj.Set("type", translateSampleType(env, type));
+    obj.Set("value", getSampleValue(env, type, value));
+
+    return obj;
+}
+
+void Parser::nativeSamplesCallback(dc_sample_type_t type, dc_sample_value_t value, void *userdata)
+{
+    auto parser = (Parser *)userdata;
+
+    parser->sampleCallback.Call({
+        wrapSample(parser->Env(), type, value),
+    });
+}
+
+Napi::Value Parser::samplesForeach(const Napi::CallbackInfo &info)
+{
+    if (info.Length() == 1 && !info[1].IsFunction())
+    {
+        throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {function}");
+    }
+
+    sampleCallback = Napi::Persistent(info[1].As<Napi::Function>());
+
+    dc_parser_samples_foreach(parser, &nativeSamplesCallback, this);
+
+    return info.Env().Undefined();
 }

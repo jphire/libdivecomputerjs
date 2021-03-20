@@ -10,10 +10,14 @@
 #include "enums/fieldvalues/divemode.h"
 #include "enums/fieldvalues/tankvolume.h"
 #include "enums/fieldvalues/watertype.h"
+#include "enums/sampletypes.h"
+#include "enums/samplevalues/eventsampletype.h"
 #include "transports/usbhid.h"
 #include "transports/serial.h"
 #include "transports/irda.h"
 #include "transports/bluetooth.h"
+#include "iostream.h"
+#include "parser.h"
 
 using namespace Napi;
 
@@ -26,6 +30,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     IRDATransport::Init(env, exports);
     SerialTransport::Init(env, exports);
     Device::Init(env, exports);
+    Parser::Init(env, exports);
+    IOStream::Init(env, exports);
 
     exports.Set(Napi::String::New(env, "version"), Napi::Function::New(env, getVersion));
     exports.Set(Napi::String::New(env, "LogLevel"), getLogLevels(env));
@@ -35,6 +41,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     exports.Set(Napi::String::New(env, "DiveMode"), getAllDiveModes(env));
     exports.Set(Napi::String::New(env, "TankVolume"), getAllTankVolumes(env));
     exports.Set(Napi::String::New(env, "WaterType"), getAllWaterTypes(env));
+    exports.Set(Napi::String::New(env, "SampleEventType"), getAllSampleEventTypes(env));
+    exports.Set(Napi::String::New(env, "SampleType"), getAllSampleTypes(env));
 
     return exports;
 }
