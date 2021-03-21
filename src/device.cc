@@ -38,7 +38,12 @@ Device::Device(const Napi::CallbackInfo &info)
 
 Device::~Device()
 {
-    dc_device_close(device);
+    printf("delete device\n");
+    if (device != NULL)
+    {
+        dc_device_close(device);
+        device = NULL;
+    }
 }
 
 dc_device_t *Device::getNative()
@@ -86,7 +91,7 @@ void Device::setCancel(const Napi::CallbackInfo &info)
     {
         throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {function}.");
     }
-    eventCallback = Napi::Persistent(info[1].As<Napi::Function>());
+    cancelCallback = Napi::Persistent(info[0].As<Napi::Function>());
 
     dc_device_set_cancel(
         device,
@@ -104,12 +109,12 @@ int Device::nativeCancelCallback(void *userdata)
         return 0;
     }
 
-    if (!result.IsNumber())
+    if (!result.IsBoolean())
     {
-        throw Napi::TypeError::New(device->Env(), "Return value of cancel callback must be an integer number");
+        throw Napi::TypeError::New(device->Env(), "Return value of cancel callback must be an boolean");
     }
 
-    return result.ToNumber().Int32Value();
+    return result.ToBoolean().Value() ? 1 : 0;
 }
 
 void Device::setFingerprint(const Napi::CallbackInfo &info)

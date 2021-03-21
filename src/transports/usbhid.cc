@@ -71,6 +71,8 @@ USBHIDTransport::USBHIDTransport(const Napi::CallbackInfo &info)
 
 USBHIDTransport::~USBHIDTransport()
 {
+
+    printf("delete device\n");
     if (device)
     {
         dc_usbhid_device_free(device);

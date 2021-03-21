@@ -23,6 +23,7 @@ IOStream::IOStream(const Napi::CallbackInfo &info)
 
 IOStream::~IOStream()
 {
+    printf("delete iostream\n");
     dc_iostream_close(iostream);
 }
 

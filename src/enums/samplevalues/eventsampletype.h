@@ -28,5 +28,5 @@
 #define SAMPLE_EVENT_TYPE_TISSUE_LEVEL_WARNING "TissueLevelWarning"
 #define SAMPLE_EVENT_TYPE_GASCHANGE2 "Gaschange2"
 
-const char *translateSampleEventType(unsigned int type);
+const char *translateSampleEventType(Napi::Env env, unsigned int type);
 Napi::Object getAllSampleEventTypes(Napi::Env env);

@@ -39,6 +39,8 @@ Parser::Parser(const Napi::CallbackInfo &info)
 
 Parser::~Parser()
 {
+
+    printf("delete Parser\n");
     if (parser)
     {
         dc_parser_destroy(parser);
@@ -209,7 +211,7 @@ Napi::Object wrapEventSample(Napi::Env env, dc_sample_value_t value)
     auto event = Napi::Object::New(env);
     event.Set("time", value.event.time);
     event.Set("flags", value.event.flags);
-    event.Set("type", translateSampleEventType(value.event.type));
+    event.Set("type", translateSampleEventType(env, value.event.type));
     event.Set("value", value.event.value);
     return event;
 }
@@ -288,12 +290,12 @@ void Parser::nativeSamplesCallback(dc_sample_type_t type, dc_sample_value_t valu
 
 Napi::Value Parser::samplesForeach(const Napi::CallbackInfo &info)
 {
-    if (info.Length() == 1 && !info[1].IsFunction())
+    if (info.Length() != 1 || !info[0].IsFunction())
     {
         throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {function}");
     }
 
-    sampleCallback = Napi::Persistent(info[1].As<Napi::Function>());
+    sampleCallback = Napi::Persistent(info[0].As<Napi::Function>());
 
     dc_parser_samples_foreach(parser, &nativeSamplesCallback, this);
 
