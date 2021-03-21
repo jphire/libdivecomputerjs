@@ -17,7 +17,8 @@ void USBHIDTransport::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod<&USBHIDTransport::open>("open"),
         });
 
-    USBHIDTransport::constructor = Napi::Persistent(func);
+    constructor = Napi::Persistent(func);
+    constructor.SuppressDestruct();
 
     exports.Set("USBHIDTransport", func);
 }
@@ -71,8 +72,6 @@ USBHIDTransport::USBHIDTransport(const Napi::CallbackInfo &info)
 
 USBHIDTransport::~USBHIDTransport()
 {
-
-    printf("delete device\n");
     if (device)
     {
         dc_usbhid_device_free(device);

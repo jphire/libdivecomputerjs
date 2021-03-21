@@ -11,7 +11,7 @@ Napi::String getVersion(const Napi::CallbackInfo &info)
     dc_version_t ver;
     dc_version(&ver);
     char output[16];
-    snprintf(output, 16, "v%d.%d.%d", ver.major, ver.minor, ver.micro);
+    snprintf(output, 16, "%d.%d.%d", ver.major, ver.minor, ver.micro);
 
     return Napi::String::New(env, output);
 }

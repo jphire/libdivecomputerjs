@@ -26,7 +26,6 @@ Context::Context(const Napi::CallbackInfo &info)
 
 Context::~Context()
 {
-    printf("delete context\n");
     if (context != NULL)
     {
         dc_context_free(context);

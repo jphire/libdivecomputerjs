@@ -9,6 +9,7 @@ void IOStream::Init(Napi::Env env, Napi::Object exports)
         "IOStream",
         {});
     constructor = Napi::Persistent(func);
+    constructor.SuppressDestruct();
 }
 
 IOStream::IOStream(const Napi::CallbackInfo &info)
@@ -23,7 +24,6 @@ IOStream::IOStream(const Napi::CallbackInfo &info)
 
 IOStream::~IOStream()
 {
-    printf("delete iostream\n");
     dc_iostream_close(iostream);
 }
 

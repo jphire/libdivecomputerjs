@@ -16,6 +16,7 @@ void BluetoothTransport::Init(Napi::Env env, Napi::Object exports)
         });
 
     constructor = Napi::Persistent(func);
+    constructor.SuppressDestruct();
 
     exports.Set("BluetoothTransport", func);
 }

@@ -38,7 +38,6 @@ Device::Device(const Napi::CallbackInfo &info)
 
 Device::~Device()
 {
-    printf("delete device\n");
     if (device != NULL)
     {
         dc_device_close(device);

@@ -23,7 +23,6 @@ Descriptor::Descriptor(const Napi::CallbackInfo &info)
 
 Descriptor::~Descriptor()
 {
-    printf("delete descriptor\n");
     if (descriptor)
     {
         dc_descriptor_free(descriptor);
@@ -45,6 +44,7 @@ Napi::Object Descriptor::Init(Napi::Env env, Napi::Object exports)
         });
 
     constructor = Napi::Persistent(func);
+    constructor.SuppressDestruct();
 
     exports.Set("Descriptor", func);
 

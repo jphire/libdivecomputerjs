@@ -39,8 +39,6 @@ Parser::Parser(const Napi::CallbackInfo &info)
 
 Parser::~Parser()
 {
-
-    printf("delete Parser\n");
     if (parser)
     {
         dc_parser_destroy(parser);
