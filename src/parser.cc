@@ -15,9 +15,9 @@ void Parser::Init(Napi::Env env, Napi::Object exports)
         env,
         "Parser",
         {
-            InstanceAccessor<&Parser::setData>("setData"),
-            InstanceAccessor<&Parser::getField>("getField"),
-            InstanceAccessor<&Parser::samplesForeach>("samplesForeach"),
+            InstanceMethod<&Parser::setData>("setData"),
+            InstanceMethod<&Parser::getField>("getField"),
+            InstanceMethod<&Parser::samplesForeach>("samplesForeach"),
         });
 
     exports.Set("Parser", func);
@@ -48,14 +48,14 @@ Parser::~Parser()
 
 Napi::Value Parser::setData(const Napi::CallbackInfo &info)
 {
-    if (info.Length() == 1 && info[0].IsArrayBuffer())
+    if (info.Length() != 1 || !info[0].IsBuffer())
     {
         throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {ArrayBuffer} given from device.foreach");
     }
 
-    auto data = info[0].As<Napi::ArrayBuffer>();
+    auto data = info[0].As<Napi::Buffer<unsigned char>>();
 
-    auto status = dc_parser_set_data(parser, reinterpret_cast<unsigned char *>(data.Data()), data.ByteLength());
+    auto status = dc_parser_set_data(parser, data.Data(), data.ByteLength());
     DCError::AssertSuccess(info.Env(), status);
 
     return info.Env().Undefined();
@@ -121,7 +121,7 @@ inline void emptySalinity(dc_salinity_t &salinity)
 
 Napi::Value Parser::getField(const Napi::CallbackInfo &info)
 {
-    if (info.Length() == 1 && info[0].IsString())
+    if (info.Length() != 1 || !info[0].IsString())
     {
         throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {string} where string is any of FieldTypes");
     }
@@ -140,6 +140,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
     case DC_FIELD_TEMPERATURE_MINIMUM:
         double numericValue;
         status = dc_parser_get_field(parser, field, 0, &numericValue);
+        ReturnUndefinedOnUnsupported(status, info.Env());
         DCError::AssertSuccess(env, status);
 
         return Napi::Number::New(env, numericValue);
@@ -148,6 +149,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
     case DC_FIELD_TANK_COUNT:
         unsigned int integerValue;
         status = dc_parser_get_field(parser, field, 0, &integerValue);
+        ReturnUndefinedOnUnsupported(status, info.Env());
         DCError::AssertSuccess(env, status);
 
         return Napi::Number::New(env, integerValue);
@@ -156,6 +158,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
         emptyTank(tank);
 
         status = dc_parser_get_field(parser, field, 0, &tank);
+        ReturnUndefinedOnUnsupported(status, info.Env());
         DCError::AssertSuccess(env, status);
 
         return wrapTank(env, tank);
@@ -165,6 +168,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
         emptyGasmix(gasmix);
 
         status = dc_parser_get_field(parser, field, 0, &gasmix);
+        ReturnUndefinedOnUnsupported(status, info.Env());
         DCError::AssertSuccess(env, status);
 
         return wrapGasmix(env, gasmix);
@@ -174,6 +178,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
         emptySalinity(salinity);
 
         status = dc_parser_get_field(parser, field, 0, &salinity);
+        ReturnUndefinedOnUnsupported(status, info.Env());
         DCError::AssertSuccess(env, status);
 
         return wrapSalinity(env, salinity);
@@ -181,6 +186,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
     case DC_FIELD_DIVEMODE:
         dc_divemode_t divemode;
         status = dc_parser_get_field(parser, field, 0, &divemode);
+        ReturnUndefinedOnUnsupported(status, info.Env());
         DCError::AssertSuccess(env, status);
 
         return translateDiveMode(env, divemode);

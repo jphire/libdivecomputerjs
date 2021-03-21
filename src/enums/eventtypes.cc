@@ -31,10 +31,8 @@ unsigned int translateEvents(Napi::Env env, Napi::Array array)
 
 dc_event_type_t translateEvent(Napi::Env env, Napi::String value)
 {
-    auto eventString = value.Utf8Value().c_str();
+    auto eventString = value.Utf8Value();
 
-    printf("'%s' == '%s'", EVENT_CLOCK, eventString);
-    printf("'%u' == '%u'", strlen(EVENT_CLOCK), strlen(eventString));
     if (eventString == EVENT_CLOCK)
     {
         return DC_EVENT_CLOCK;
@@ -57,7 +55,7 @@ dc_event_type_t translateEvent(Napi::Env env, Napi::String value)
     }
 
     char buffer[128];
-    sprintf(buffer, "Invalid event type '%s'", eventString);
+    sprintf(buffer, "Invalid event type '%s'", eventString.c_str());
     throw Napi::TypeError::New(env, buffer);
 }
 

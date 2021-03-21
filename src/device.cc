@@ -60,8 +60,8 @@ void Device::foreach (const Napi::CallbackInfo &info)
 int Device::nativeForeachCallback(const unsigned char *data, unsigned int size, const unsigned char *fingerprint, unsigned int fsize, void *userdata)
 {
     auto device = (Device *)userdata;
-    auto diveData = Napi::ArrayBuffer::New(device->Env(), (void *)data, size);
-    auto fingerprintData = Napi::ArrayBuffer::New(device->Env(), (void *)fingerprint, fsize);
+    auto diveData = Napi::Buffer<unsigned char>::Copy(device->Env(), data, size);
+    auto fingerprintData = Napi::Buffer<unsigned char>::Copy(device->Env(), fingerprint, fsize);
 
     auto result = device->foreachCallback.Call({
         diveData,
@@ -114,13 +114,13 @@ int Device::nativeCancelCallback(void *userdata)
 
 void Device::setFingerprint(const Napi::CallbackInfo &info)
 {
-    if (info.Length() != 1 || !info[0].IsArrayBuffer())
+    if (info.Length() != 1 || !info[0].IsBuffer())
     {
         throw Napi::TypeError::New(Env(), "Invalid argument, expected {ArrayBuffer}.");
     }
 
-    auto buffer = info[0].As<Napi::ArrayBuffer>();
-    dc_device_set_fingerprint(device, (const unsigned char *)buffer.Data(), buffer.ByteLength());
+    auto buffer = info[0].As<Napi::Buffer<unsigned char>>();
+    dc_device_set_fingerprint(device, buffer.Data(), buffer.ByteLength());
 }
 
 void Device::setEvents(const Napi::CallbackInfo &info)

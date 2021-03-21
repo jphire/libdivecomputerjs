@@ -46,10 +46,8 @@ device.setEvents(allEvents, (event) => {
     console.log(event);
 });
 
-device.foreach((diveData: ArrayBuffer, fingerprint: ArrayBuffer) => {
-    console.log(fingerprint);
-
-    const parser = new Parser();
+device.foreach((diveData: Buffer, fingerprint: Buffer) => {
+    const parser = new Parser(device);
     parser.setData(diveData);
 
     console.log('time: ' + parser.getField(FieldType.DiveTime));

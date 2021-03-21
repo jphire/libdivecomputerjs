@@ -15,9 +15,9 @@ Napi::Object getAllFieldTypes(Napi::Env env)
     return fieldTypes;
 }
 
-dc_field_type_t translateField(Napi::Env env, Napi::String fieldtype)
+dc_field_type_t translateFieldType(Napi::Env env, Napi::String fieldtype)
 {
-    auto fieldtypeString = fieldtype.Utf8Value().c_str();
+    auto fieldtypeString = fieldtype.Utf8Value();
     if (fieldtypeString == FIELD_ATMOSPHERIC)
     {
         return DC_FIELD_ATMOSPHERIC;
@@ -84,6 +84,6 @@ dc_field_type_t translateField(Napi::Env env, Napi::String fieldtype)
     }
 
     char buffer[128];
-    snprintf(buffer, 128, "Invalid Field type provided: %s", fieldtypeString);
+    snprintf(buffer, 128, "Invalid Field type provided: %s", fieldtypeString.c_str());
     throw Napi::TypeError::New(env, buffer);
 }

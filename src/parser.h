@@ -1,5 +1,8 @@
 #include <napi.h>
 #include <libdivecomputer/parser.h>
+#define ReturnUndefinedOnUnsupported(status, env) \
+    if (status == DC_STATUS_UNSUPPORTED)          \
+    return env.Undefined()
 
 class Parser : public Napi::ObjectWrap<Parser>
 {

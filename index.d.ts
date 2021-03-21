@@ -180,14 +180,11 @@ declare module 'libdivecomputer' {
             descriptor: Descriptor,
             iostream: IOStream
         );
-        setFingerprint(data: ArrayBuffer): void;
+        setFingerprint(data: Buffer): void;
         setEvents(events: EventType[], callback: EventCallback): void;
         setCancel(callback: () => boolean): void;
         foreach(
-            callback: (
-                diveData: ArrayBuffer,
-                fingerprint: ArrayBuffer
-            ) => void | boolean
+            callback: (diveData: Buffer, fingerprint: Buffer) => void | boolean
         ): void;
     }
 
@@ -243,16 +240,17 @@ declare module 'libdivecomputer' {
         gasmix: number;
     };
     export class Parser {
-        setData(data: ArrayBuffer): void;
-        getField(field: NumbericFields): number;
-        getField(field: FieldType.DiveMode): DiveMode;
+        constructor(device: Device);
+        setData(data: Buffer): void;
+        getField(field: NumbericFields): ?number;
+        getField(field: FieldType.DiveMode): ?DiveMode;
         getField(
             field: FieldType.Salinity
-        ): { density: number; type: WaterType };
-        getField(field: FieldType.Tank): TankValue;
+        ): ?{ density: number; type: WaterType };
+        getField(field: FieldType.Tank): ?TankValue;
         getField(
             field: FieldType.GasMix
-        ): { helium: number; oxygen: number; nitrogen: number };
+        ): ?{ helium: number; oxygen: number; nitrogen: number };
         samplesForeach(callback: (sample: Sample) => void): void;
     }
 
