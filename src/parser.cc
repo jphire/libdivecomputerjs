@@ -17,6 +17,7 @@ void Parser::Init(Napi::Env env, Napi::Object exports)
         {
             InstanceMethod<&Parser::setData>("setData"),
             InstanceMethod<&Parser::getField>("getField"),
+            InstanceMethod<&Parser::getDatetime>("getDatetime"),
             InstanceMethod<&Parser::samplesForeach>("samplesForeach"),
         });
 
@@ -117,6 +118,28 @@ inline void emptySalinity(dc_salinity_t &salinity)
 {
     salinity.density = 0;
     salinity.type = DC_WATER_FRESH;
+}
+
+Napi::Value Parser::getDatetime(const Napi::CallbackInfo &info)
+{
+    dc_datetime_t dt;
+    auto status = dc_parser_get_datetime(parser, &dt);
+    DCError::AssertSuccess(info.Env(), status);
+
+    char buff[26];
+    snprintf(
+        buff,
+        26,
+        "%04d-%02d-%02dT%02d:%02d:%02d+%02d:%02d",
+        dt.year,
+        dt.month,
+        dt.day,
+        dt.hour,
+        dt.minute,
+        dt.second,
+        GET_TIMEZONE(dt.timezone) / 3600,
+        GET_TIMEZONE(dt.timezone) % 3600);
+    return Napi::String::New(info.Env(), buff);
 }
 
 Napi::Value Parser::getField(const Napi::CallbackInfo &info)

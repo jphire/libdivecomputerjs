@@ -251,6 +251,7 @@ declare module 'libdivecomputer' {
         getField(
             field: FieldType.GasMix
         ): ?{ helium: number; oxygen: number; nitrogen: number };
+        getDatetime(): string;
         samplesForeach(callback: (sample: Sample) => void): void;
     }
 

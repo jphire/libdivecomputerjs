@@ -49,13 +49,12 @@ device.setEvents(allEvents, (event) => {
     console.log(event);
 });
 
-device.setCancel(() => true);
-
 device.foreach((diveData: Buffer, fingerprint: Buffer) => {
     const parser = new Parser(device);
     parser.setData(diveData);
     const dive = {
         fingerprint: fingerprint.toString('base64'),
+        datetime: parser.getDatetime(),
         divetime: parser.getField(FieldType.DiveTime),
         maxDepth: parser.getField(FieldType.MaxDepth),
         avgDepth: parser.getField(FieldType.AverageDepth),
@@ -72,11 +71,9 @@ device.foreach((diveData: Buffer, fingerprint: Buffer) => {
     };
     console.log(`Dive ${dive.fingerprint}`);
 
-    console.log('time: ' + parser.getField(FieldType.DiveTime));
-    console.log('depth: ' + parser.getField(FieldType.MaxDepth));
-    console.log('tank: ', parser.getField(FieldType.Tank));
-    console.log('maxTemp: ' + parser.getField(FieldType.TemperatureMaximum));
-    console.log('minTemp: ' + parser.getField(FieldType.TemperatureMinimum));
+    console.log('datetime: ' + dive.datetime);
+    console.log('time: ' + dive.divetime);
+    console.log('depth: ' + dive.maxDepth);
 
     parser.samplesForeach((sample) => {
         dive.samples.push(sample);
