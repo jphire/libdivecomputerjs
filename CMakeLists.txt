@@ -1,22 +1,14 @@
 cmake_minimum_required(VERSION 3.9)
 cmake_policy(SET CMP0042 NEW)
 set (CMAKE_CXX_STANDARD 17)
-
-include(ExternalProject)
+include(cmake/libdivecomputer.cmake)
 
 project (libdivecomputerjs)
 
-ExternalProject_Add(libdivecomputer
-    URL https://github.com/libdivecomputer/libdivecomputer/archive/refs/heads/master.zip
-    CONFIGURE_COMMAND autoreconf --install && ./configure --prefix=${CMAKE_CURRENT_SOURCE_DIR}/deps/libdivecomputer
-    BUILD_IN_SOURCE TRUE
-)
-
 file(GLOB_RECURSE SOURCE_FILES src/*.cc src/transports/*.cc)
 
+set_directory_properties(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/deps)
 include_directories(${CMAKE_JS_INC})
-include_directories(${CMAKE_SOURCE_DIR}/deps/libdivecomputer/include)
-link_directories(${CMAKE_SOURCE_DIR}/deps/libdivecomputer/lib)
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 add_dependencies(${PROJECT_NAME} libdivecomputer)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")

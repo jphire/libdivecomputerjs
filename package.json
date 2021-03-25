@@ -11,7 +11,7 @@
     "test": "mocha --require ./tshook.js --recursive  'test/**/*.spec.ts'",
     "sample": "ts-node examples/download-eonsteel.ts",
     "all": "yarn configure && yarn build && yarn test",
-    "clean": "cmake-js clean"
+    "clean": "(cd build && make clean && cd ..) || cmake-js clean"
   },
   "devDependencies": {
     "@types/chai": "^4.2.15",
