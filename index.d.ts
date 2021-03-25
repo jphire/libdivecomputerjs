@@ -19,11 +19,11 @@ declare module 'libdivecomputer' {
     }
 
     export enum EventType {
-        Clock,
-        DevInfo,
-        Progress,
-        Waiting,
-        Vendor,
+        Clock = 'Clock',
+        DevInfo = 'DevInfo',
+        Progress = 'Progress',
+        Waiting = 'Waiting',
+        Vendor = 'Vendor',
     }
 
     export enum FieldType {
@@ -160,11 +160,11 @@ declare module 'libdivecomputer' {
     class IOStream {}
 
     type EventData<T extends EventType, D extends object> = {
-        event: T;
+        type: T;
         data: D;
     };
     type EventsData =
-        | EventData<EventType.Clock, { devtime: number; systime: number }>
+        | EventData<EventType.Clock, { devtime: number; systime: bigint }>
         | EventData<
               EventType.DevInfo,
               { firmware: number; model: number; serial: number }
@@ -240,7 +240,13 @@ declare module 'libdivecomputer' {
         gasmix: number;
     };
     export class Parser {
-        constructor(device: Device);
+        static fromDevice(device: Device): Parser;
+        static fromData(
+            context: Context,
+            descriptor: Descriptor,
+            devtime: number,
+            systime: bigint
+        ): Parser;
         setData(data: Buffer): void;
         getField(field: NumbericFields): ?number;
         getField(field: FieldType.DiveMode): ?DiveMode;

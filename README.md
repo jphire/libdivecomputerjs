@@ -6,6 +6,9 @@ This project tries to stay as close to the original project regarding the callin
 
 As an example see `test/download-eonsteel.ts` as a reference.
 
+## Installation
+
+
 ## Deviations from the original project
 
 -   I used class for all major parts of the project instead of functions operating on objects. For instance `Parser` has all functionality of `dc_parser_t` and `USBHIDTransport` for `dc_usbhid_device_t`

@@ -4,6 +4,6 @@ import libdivecomputer from 'libdivecomputer';
 describe('version', () => {
     it('reads current version', () => {
         const value = libdivecomputer.version();
-        expect(value).to.equals('v0.7.0');
+        expect(value).to.equals('0.7.0');
     });
 });

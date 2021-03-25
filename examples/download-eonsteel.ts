@@ -14,6 +14,11 @@ import {
 import { getEonSteel } from './helpers/descriptors';
 import fs from 'fs';
 
+const OUTPUTS_DIR = './outputs';
+if (!fs.existsSync(OUTPUTS_DIR)) {
+    fs.mkdirSync(OUTPUTS_DIR);
+}
+
 console.log(`libdivecomputer v${version()}`);
 
 const context = new Context();
@@ -49,8 +54,11 @@ device.setEvents(allEvents, (event) => {
     console.log(event);
 });
 
+let iX = 0;
 device.foreach((diveData: Buffer, fingerprint: Buffer) => {
-    const parser = new Parser(device);
+    const filename = `${eonSteel.vendor}_${eonSteel.product}_${iX++}`;
+
+    const parser = Parser.fromDevice(device);
     parser.setData(diveData);
     const dive = {
         fingerprint: fingerprint.toString('base64'),
@@ -80,5 +88,5 @@ device.foreach((diveData: Buffer, fingerprint: Buffer) => {
     });
 
     const asstring = JSON.stringify(dive, null, 4);
-    fs.writeFileSync(`./outp/${dive.fingerprint}.json`, asstring);
+    fs.writeFileSync(`${OUTPUTS_DIR}/${filename}.json`, asstring);
 });

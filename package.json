@@ -6,9 +6,10 @@
   "types": "index.d.ts",
   "scripts": {
     "configure": "cmake-js configure",
+    "install": "cmake-js compile",
     "build": "cmake-js build",
     "test": "mocha --require ./tshook.js --recursive  'test/**/*.spec.ts'",
-    "sample": "ts-node test/download-eonsteel.ts",
+    "sample": "ts-node examples/download-eonsteel.ts",
     "all": "yarn configure && yarn build && yarn test",
     "clean": "cmake-js clean"
   },

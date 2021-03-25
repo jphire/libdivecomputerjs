@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "context.h"
 #include "device.h"
+#include "descriptor.h"
 #include "errors/DCError.h"
 #include "enums/fieldtypes.h"
 #include "enums/sampletypes.h"
@@ -9,33 +10,78 @@
 #include "enums/fieldvalues/watertype.h"
 #include "enums/samplevalues/eventsampletype.h"
 
+Napi::FunctionReference Parser::constructor;
+
 void Parser::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::Function func = DefineClass(
         env,
         "Parser",
         {
+            StaticMethod<&Parser::fromDevice>("fromDevice"),
+            StaticMethod<&Parser::fromData>("fromData"),
+            InstanceMethod<&Parser::setData>("setData"),
             InstanceMethod<&Parser::setData>("setData"),
             InstanceMethod<&Parser::getField>("getField"),
             InstanceMethod<&Parser::getDatetime>("getDatetime"),
             InstanceMethod<&Parser::samplesForeach>("samplesForeach"),
         });
 
+    constructor = Napi::Persistent(func);
+    constructor.SuppressDestruct();
+
     exports.Set("Parser", func);
+}
+
+Napi::Value Parser::fromDevice(const Napi::CallbackInfo &info)
+{
+    if (info.Length() != 1 || !info[0].IsObject())
+    {
+        throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {device}.");
+    }
+
+    dc_parser_t *parser;
+    auto device = Napi::ObjectWrap<Device>::Unwrap(info[0].ToObject());
+    auto status = dc_parser_new(&parser, device->getNative());
+    DCError::AssertSuccess(info.Env(), status);
+
+    return constructor.New({
+        Napi::External<dc_parser_t>::New(info.Env(), parser),
+    });
+}
+
+Napi::Value Parser::fromData(const Napi::CallbackInfo &info)
+{
+    if (info.Length() != 4 || !info[0].IsObject() || !info[1].IsObject() || !info[2].IsNumber() || !info[3].IsBigInt())
+    {
+        throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {context}, {descriptor}, {devtime: number}, {systime: number}");
+    }
+
+    auto context = Napi::ObjectWrap<Context>::Unwrap(info[0].ToObject());
+    auto descriptor = Napi::ObjectWrap<Descriptor>::Unwrap(info[1].ToObject());
+    auto devtime = info[2].ToNumber().Uint32Value();
+    bool lossless = false;
+    auto systime = info[3].As<Napi::BigInt>().Int64Value(&lossless);
+
+    dc_parser_t *parser;
+    auto status = dc_parser_new2(&parser, context->getNative(), descriptor->getNative(), devtime, systime);
+    DCError::AssertSuccess(info.Env(), status);
+
+    return constructor.New({
+        Napi::External<dc_parser_t>::New(info.Env(), parser),
+    });
 }
 
 Parser::Parser(const Napi::CallbackInfo &info)
     : Napi::ObjectWrap<Parser>(info)
 {
 
-    if (info.Length() != 1 || !info[0].IsObject())
+    if (info.Length() != 1 || !info[0].IsExternal())
     {
-        throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {device}.");
+        throw Napi::TypeError::New(info.Env(), "Unable to construct parser, use `Parser.fromDevice({device})` or Parser.fromData({context}, {descriptor}, {devtime: number}, {systime: number})");
     }
 
-    auto device = Napi::ObjectWrap<Device>::Unwrap(info[0].ToObject());
-    auto status = dc_parser_new(&parser, device->getNative());
-    DCError::AssertSuccess(info.Env(), status);
+    parser = info[0].As<Napi::External<dc_parser_t>>().Data();
 }
 
 Parser::~Parser()

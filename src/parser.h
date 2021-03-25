@@ -9,6 +9,8 @@ class Parser : public Napi::ObjectWrap<Parser>
 {
 public:
     static void Init(Napi::Env env, Napi::Object exports);
+    static Napi::Value fromDevice(const Napi::CallbackInfo &);
+    static Napi::Value fromData(const Napi::CallbackInfo &);
     Parser(const Napi::CallbackInfo &);
     ~Parser();
     Napi::Value getDatetime(const Napi::CallbackInfo &);
@@ -17,6 +19,7 @@ public:
     Napi::Value samplesForeach(const Napi::CallbackInfo &);
 
 private:
+    static Napi::FunctionReference constructor;
     dc_parser_t *parser;
     Napi::FunctionReference sampleCallback;
     static void nativeSamplesCallback(dc_sample_type_t type, dc_sample_value_t value, void *userdata);

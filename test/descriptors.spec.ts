@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import { Descriptor, Transport } from 'libdivecomputer';
 import assertType from 'chai-asserttype';
-import { getEonSteel } from './helpers/descriptors';
+import { getEonSteel } from '../examples/helpers/descriptors';
 chai.use(assertType);
 
 describe('descriptors', () => {
