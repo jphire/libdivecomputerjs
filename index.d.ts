@@ -240,13 +240,13 @@ declare module 'libdivecomputer' {
         gasmix: number;
     };
     export class Parser {
-        static fromDevice(device: Device): Parser;
-        static fromData(
+        constructor(device: Device);
+        constructor(
             context: Context,
             descriptor: Descriptor,
             devtime: number,
             systime: bigint
-        ): Parser;
+        );
         setData(data: Buffer): void;
         getField(field: NumbericFields): ?number;
         getField(field: FieldType.DiveMode): ?DiveMode;

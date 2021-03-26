@@ -58,7 +58,7 @@ let iX = 0;
 device.foreach((diveData: Buffer, fingerprint: Buffer) => {
     const filename = `${eonSteel.vendor}_${eonSteel.product}_${iX++}`;
 
-    const parser = Parser.fromDevice(device);
+    const parser = new Parser(device);
     parser.setData(diveData);
     const dive = {
         fingerprint: fingerprint.toString('base64'),

@@ -18,8 +18,6 @@ void Parser::Init(Napi::Env env, Napi::Object exports)
         env,
         "Parser",
         {
-            StaticMethod<&Parser::fromDevice>("fromDevice"),
-            StaticMethod<&Parser::fromData>("fromData"),
             InstanceMethod<&Parser::setData>("setData"),
             InstanceMethod<&Parser::setData>("setData"),
             InstanceMethod<&Parser::getField>("getField"),
@@ -33,7 +31,7 @@ void Parser::Init(Napi::Env env, Napi::Object exports)
     exports.Set("Parser", func);
 }
 
-Napi::Value Parser::fromDevice(const Napi::CallbackInfo &info)
+dc_parser_t *Parser::fromDevice(const Napi::CallbackInfo &info)
 {
     if (info.Length() != 1 || !info[0].IsObject())
     {
@@ -45,12 +43,10 @@ Napi::Value Parser::fromDevice(const Napi::CallbackInfo &info)
     auto status = dc_parser_new(&parser, device->getNative());
     DCError::AssertSuccess(info.Env(), status);
 
-    return constructor.New({
-        Napi::External<dc_parser_t>::New(info.Env(), parser),
-    });
+    return parser;
 }
 
-Napi::Value Parser::fromData(const Napi::CallbackInfo &info)
+dc_parser_t *Parser::fromData(const Napi::CallbackInfo &info)
 {
     if (info.Length() != 4 || !info[0].IsObject() || !info[1].IsObject() || !info[2].IsNumber() || !info[3].IsBigInt())
     {
@@ -67,21 +63,25 @@ Napi::Value Parser::fromData(const Napi::CallbackInfo &info)
     auto status = dc_parser_new2(&parser, context->getNative(), descriptor->getNative(), devtime, systime);
     DCError::AssertSuccess(info.Env(), status);
 
-    return constructor.New({
-        Napi::External<dc_parser_t>::New(info.Env(), parser),
-    });
+    return parser;
 }
 
 Parser::Parser(const Napi::CallbackInfo &info)
     : Napi::ObjectWrap<Parser>(info)
 {
 
-    if (info.Length() != 1 || !info[0].IsExternal())
+    if (info.Length() == 1)
     {
-        throw Napi::TypeError::New(info.Env(), "Unable to construct parser, use `Parser.fromDevice({device})` or Parser.fromData({context}, {descriptor}, {devtime: number}, {systime: number})");
+        parser = Parser::fromDevice(info);
     }
-
-    parser = info[0].As<Napi::External<dc_parser_t>>().Data();
+    else if (info.Length() == 4)
+    {
+        parser = Parser::fromData(info);
+    }
+    else
+    {
+        throw Napi::TypeError::New(info.Env(), "Unable to construct parser, use `new Parser({device})` or new Parser({context}, {descriptor}, {devtime: number}, {systime: number})");
+    }
 }
 
 Parser::~Parser()

@@ -1,14 +1,8 @@
 import { expect } from 'chai';
-import {
-    Context,
-    Descriptor,
-    FieldType,
-    Parser,
-    TankVolume,
-} from 'libdivecomputer';
+import { Context, Descriptor, FieldType, Parser } from 'libdivecomputer';
 import { readFileSync } from 'fs';
 import { getEonSteel } from '../examples/helpers/descriptors';
-import { bundleDiveData, unbundleDiveData } from '../examples/helpers/parser';
+import { unbundleDiveData } from '../examples/helpers/parser';
 
 describe('Parser', () => {
     let context: Context;
@@ -32,19 +26,19 @@ describe('Parser', () => {
     });
 
     it('can create a parser', () => {
-        const parser = Parser.fromData(context, descriptor, devtime, systime);
+        const parser = new Parser(context, descriptor, devtime, systime);
         expect(parser).not.null;
     });
 
     it('set divedata', () => {
-        const parser = Parser.fromData(context, descriptor, devtime, systime);
+        const parser = new Parser(context, descriptor, devtime, systime);
         parser.setData(diveData);
     });
 
     describe('Parser with data', () => {
         let parser: Parser;
         before(() => {
-            parser = Parser.fromData(context, descriptor, devtime, systime);
+            parser = new Parser(context, descriptor, devtime, systime);
             parser.setData(diveData);
         });
 
