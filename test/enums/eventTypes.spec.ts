@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { EventType } from 'libdivecomputer';
+import { EventType } from 'libdivecomputerjs';
 
 describe('EventTypes', () => {
     it('Has all EventTypes', () => {

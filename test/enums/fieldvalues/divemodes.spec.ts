@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { DiveMode } from 'libdivecomputer';
+import { DiveMode } from 'libdivecomputerjs';
 
 describe('Divemode', () => {
     it('Has all divemodes', () => {

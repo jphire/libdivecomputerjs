@@ -7,7 +7,7 @@ import {
     LogLevel,
     USBHIDTransport,
     version,
-} from 'libdivecomputer';
+} from 'libdivecomputerjs';
 import { getEonSteel } from './helpers/descriptors';
 import fs from 'fs';
 import { bundleDiveData } from './helpers/parser';

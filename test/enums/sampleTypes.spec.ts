@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { SampleType } from 'libdivecomputer';
+import { SampleType } from 'libdivecomputerjs';
 
 describe('SampleTypes', () => {
     it('Has all samples types', () => {

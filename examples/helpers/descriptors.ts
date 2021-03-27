@@ -1,4 +1,4 @@
-import { Descriptor } from 'libdivecomputer';
+import { Descriptor } from 'libdivecomputerjs';
 
 export function getEonSteel(): undefined | Descriptor {
     return Array.from(Descriptor.iterate()).filter(

@@ -10,7 +10,7 @@ import {
     Sample,
     USBHIDTransport,
     version,
-} from 'libdivecomputer';
+} from 'libdivecomputerjs';
 import { getEonSteel } from './helpers/descriptors';
 import fs from 'fs';
 

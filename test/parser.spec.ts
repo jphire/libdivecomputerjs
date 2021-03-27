@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Context, Descriptor, FieldType, Parser } from 'libdivecomputer';
+import { Context, Descriptor, FieldType, Parser } from 'libdivecomputerjs';
 import { readFileSync } from 'fs';
 import { getEonSteel } from '../examples/helpers/descriptors';
 import { unbundleDiveData } from '../examples/helpers/parser';

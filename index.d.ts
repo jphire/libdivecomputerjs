@@ -1,4 +1,4 @@
-declare module 'libdivecomputer' {
+declare module 'libdivecomputerjs' {
     export enum LogLevel {
         None,
         Error,

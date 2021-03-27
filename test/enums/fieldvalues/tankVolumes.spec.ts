@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { TankVolume } from 'libdivecomputer';
+import { TankVolume } from 'libdivecomputerjs';
 
 describe('WaterType', () => {
     it('Has all WaterType', () => {

@@ -1,5 +1,5 @@
 import chai, { expect } from 'chai';
-import { Context, LogLevel, Transport } from 'libdivecomputer';
+import { Context, LogLevel, Transport } from 'libdivecomputerjs';
 import assertType from 'chai-asserttype';
 chai.use(assertType);
 

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { FieldType } from 'libdivecomputer';
+import { FieldType } from 'libdivecomputerjs';
 
 describe('FieldTypes', () => {
     it('Has all FieldTypes', () => {

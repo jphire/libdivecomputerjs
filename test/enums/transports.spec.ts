@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import libdivecomputer from 'libdivecomputer';
+import libdivecomputer from 'libdivecomputerjs';
 
 describe('Transport', () => {
     it('Has all Transports', () => {
