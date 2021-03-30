@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.9)
 cmake_policy(SET CMP0042 NEW)
 set (CMAKE_CXX_STANDARD 17)
-include(cmake/libdivecomputer.cmake)
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 project (libdivecomputerjs)
+
+include(cmake/libdivecomputer.cmake)
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cc src/transports/*.cc)
 
@@ -12,8 +15,14 @@ include_directories(${CMAKE_JS_INC})
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 add_dependencies(${PROJECT_NAME} libdivecomputer)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
-target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
-target_link_libraries(${PROJECT_NAME} divecomputer)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} divecomputer)
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    $<TARGET_FILE:divecomputer>
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>
+)
 
 # Include Node-API wrappers
 execute_process(COMMAND node -p "require('node-addon-api').include"
