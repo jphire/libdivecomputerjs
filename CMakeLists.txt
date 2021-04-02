@@ -17,12 +17,15 @@ add_dependencies(${PROJECT_NAME} libdivecomputer)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} divecomputer)
 
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    $<TARGET_FILE:divecomputer>
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>
-)
+
+IF(WIN32)
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:divecomputer>
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    )
+ENDIF()
 
 # Include Node-API wrappers
 execute_process(COMMAND node -p "require('node-addon-api').include"
