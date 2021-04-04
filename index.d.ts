@@ -1,21 +1,21 @@
 declare module 'libdivecomputerjs' {
     export enum LogLevel {
-        None,
-        Error,
-        Warning,
-        Info,
-        Debug,
-        All,
+        None = 'None',
+        Error = 'Error',
+        Warning = 'Warning',
+        Info = 'Info',
+        Debug = 'Debug',
+        All = 'All',
     }
 
     export enum Transport {
-        None,
-        IRDA,
-        USB,
-        USBHID,
-        Serial,
-        Bluetooth,
-        BLE,
+        None = 'None',
+        IRDA = 'IRDA',
+        USB = 'USB',
+        USBHID = 'USBHID',
+        Serial = 'Serial',
+        Bluetooth = 'Bluetooth',
+        BLE = 'BLE',
     }
 
     export enum EventType {
@@ -27,84 +27,84 @@ declare module 'libdivecomputerjs' {
     }
 
     export enum FieldType {
-        Atmospheric,
-        AverageDepth,
-        DiveMode,
-        DiveTime,
-        GasMix,
-        GasMixCount,
-        MaxDepth,
-        Salinity,
-        Tank,
-        TankCount,
-        TemperatureMaximum,
-        TemperatureMinimum,
-        TemperatureSurface,
+        Atmospheric = 'Atmospheric',
+        AverageDepth = 'AverageDepth',
+        DiveMode = 'DiveMode',
+        DiveTime = 'DiveTime',
+        GasMix = 'GasMix',
+        GasMixCount = 'GasMixCount',
+        MaxDepth = 'MaxDepth',
+        Salinity = 'Salinity',
+        Tank = 'Tank',
+        TankCount = 'TankCount',
+        TemperatureMaximum = 'TemperatureMaximum',
+        TemperatureMinimum = 'TemperatureMinimum',
+        TemperatureSurface = 'TemperatureSurface',
     }
 
     export enum DiveMode {
-        Freedive,
-        Gauge,
-        OpenCircuit,
-        ClosedCircuitRebreather,
-        SemiclosedCircuitRebreather,
+        Freedive = 'Freedive',
+        Gauge = 'Gauge',
+        OpenCircuit = 'OpenCircuit',
+        ClosedCircuitRebreather = 'ClosedCircuitRebreather',
+        SemiclosedCircuitRebreather = 'SemiclosedCircuitRebreather',
     }
 
     export enum TankVolume {
-        None,
-        Imperial,
-        Metric,
+        None = 'None',
+        Imperial = 'Imperial',
+        Metric = 'Metric',
     }
 
     export enum WaterType {
-        Fresh,
-        Salt,
+        Fresh = 'Fresh',
+        Salt = 'Salt',
     }
 
     export enum SampleType {
-        Bearing,
-        CNS,
-        Deco,
-        Depth,
-        Event,
-        Gasmix,
-        Heartbeat,
-        PPO2,
-        Pressure,
-        RBT,
-        Setpoint,
-        Temperature,
-        Time,
-        Vendor,
+        Bearing = 'Bearing',
+        CNS = 'CNS',
+        Deco = 'Deco',
+        Depth = 'Depth',
+        Event = 'Event',
+        Gasmix = 'Gasmix',
+        Heartbeat = 'Heartbeat',
+        PPO2 = 'PPO2',
+        Pressure = 'Pressure',
+        RBT = 'RBT',
+        Setpoint = 'Setpoint',
+        Temperature = 'Temperature',
+        Time = 'Time',
+        Vendor = 'Vendor',
     }
 
     export enum SampleEventType {
-        None,
-        Deco,
-        RBT,
-        Ascent,
-        Ceiling,
-        Workload,
-        Transmitter,
-        Violation,
-        Bookmark,
-        Surface,
-        SafetyStop,
-        Gaschange,
-        SafetyStopVoluntary,
-        SafetyStopMandatory,
-        Deepstop,
-        CeilingSafetyStop,
-        Floor,
-        Divetime,
-        Maxdepth,
-        OLF,
-        PO2,
-        Airtime,
-        RGBM,
-        Heading,
-        TissueLevelWarning,
-        Gaschange2,
+        None = 'None',
+        Deco = 'Deco',
+        RBT = 'RBT',
+        Ascent = 'Ascent',
+        Ceiling = 'Ceiling',
+        Workload = 'Workload',
+        Transmitter = 'Transmitter',
+        Violation = 'Violation',
+        Bookmark = 'Bookmark',
+        Surface = 'Surface',
+        SafetyStop = 'SafetyStop',
+        Gaschange = 'Gaschange',
+        SafetyStopVoluntary = 'SafetyStopVoluntary',
+        SafetyStopMandatory = 'SafetyStopMandatory',
+        Deepstop = 'Deepstop',
+        CeilingSafetyStop = 'CeilingSafetyStop',
+        Floor = 'Floor',
+        Divetime = 'Divetime',
+        Maxdepth = 'Maxdepth',
+        OLF = 'OLF',
+        PO2 = 'PO2',
+        Airtime = 'Airtime',
+        RGBM = 'RGBM',
+        Heading = 'Heading',
+        TissueLevelWarning = 'TissueLevelWarning',
+        Gaschange2 = 'Gaschange2',
     }
 
     export class Descriptor {
@@ -112,7 +112,7 @@ declare module 'libdivecomputerjs' {
         readonly product: string;
         readonly vendor: string;
         readonly model: number;
-        readonly transports: Transports[];
+        readonly transports: Transport[];
     }
 
     export class USBHIDTransport {
@@ -170,7 +170,7 @@ declare module 'libdivecomputerjs' {
               { firmware: number; model: number; serial: number }
           >
         | EventData<EventType.Progress, { current: number; maximum: number }>
-        | EventData<EventType.Waiting, void>;
+        | { type: EventType.Waiting };
 
     type EventCallback = (args: EventsData) => void;
 
@@ -190,7 +190,7 @@ declare module 'libdivecomputerjs' {
 
     export class Context {
         logLevel: LogLevel;
-        readonly transports: Transports[];
+        readonly transports: Transport[];
         log(logLevel: LogLevel, message: string);
         onLog(cb: (logLevel: LogLevel, message: string) => void);
     }
@@ -248,15 +248,15 @@ declare module 'libdivecomputerjs' {
             systime: bigint
         );
         setData(data: Buffer): void;
-        getField(field: NumbericFields): ?number;
-        getField(field: FieldType.DiveMode): ?DiveMode;
+        getField(field: NumbericFields): undefined | number;
+        getField(field: FieldType.DiveMode): undefined | DiveMode;
         getField(
             field: FieldType.Salinity
-        ): ?{ density: number; type: WaterType };
-        getField(field: FieldType.Tank): ?TankValue;
+        ): undefined | { density: number; type: WaterType };
+        getField(field: FieldType.Tank): undefined | TankValue;
         getField(
             field: FieldType.GasMix
-        ): ?{ helium: number; oxygen: number; nitrogen: number };
+        ): undefined | { helium: number; oxygen: number; nitrogen: number };
         getDatetime(): string;
         samplesForeach(callback: (sample: Sample) => void): void;
     }
