@@ -61,6 +61,28 @@ declare module 'libdivecomputerjs' {
         Salt = 'Salt',
     }
 
+    export class AsyncDeviceReader {
+        setContext(context: Context): void;
+        setDescriptor(descriptor: Descriptor): void;
+        setTransport(
+            transport:
+                | USBHIDTransport
+                | SerialTransport
+                | IRDATransport
+                | BluetoothTranport
+        ): void;
+        setEvents(events: EventType[], callback: EventCallback): void;
+        setDive(
+            callback: (diveData: Buffer, fingerprint: Buffer) => void
+        ): void;
+        read(cb: () => void): void;
+    }
+
+    export function test(
+        dive: (dive: Buffer, fingerprint: Buffer) => void,
+        cb: () => void
+    );
+
     export enum SampleType {
         Bearing = 'Bearing',
         CNS = 'CNS',
@@ -184,7 +206,7 @@ declare module 'libdivecomputerjs' {
         setEvents(events: EventType[], callback: EventCallback): void;
         setCancel(callback: () => boolean): void;
         foreach(
-            callback: (diveData: Buffer, fingerprint: Buffer) => void | boolean
+            itemCallback: (diveData: Buffer, fingerprint: Buffer) => void
         ): void;
     }
 

@@ -1,5 +1,7 @@
 #include <napi.h>
 #include <libdivecomputer/device.h>
+#include "context.h"
+#include "descriptor.h"
 
 class Device : public Napi::ObjectWrap<Device>
 {
@@ -17,6 +19,8 @@ private:
     Napi::FunctionReference eventCallback;
     Napi::FunctionReference cancelCallback;
     Napi::FunctionReference foreachCallback;
+    Context *context;
+    Descriptor *descriptor;
     dc_device_t *device;
     static void nativeEventCallback(dc_device_t *d, dc_event_type_t event, const void *data, void *userdata);
     static int nativeCancelCallback(void *userdata);

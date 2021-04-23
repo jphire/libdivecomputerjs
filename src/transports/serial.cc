@@ -98,13 +98,18 @@ Napi::Value SerialTransport::open(const Napi::CallbackInfo &info)
 
     auto context = Napi::ObjectWrap<Context>::Unwrap(info[0].As<Napi::Object>());
 
-    auto name = dc_serial_device_get_name(device);
     dc_iostream_t *iostream;
-    auto status = dc_serial_open(&iostream, context->getNative(), name);
+    auto status = getNative(&iostream, context->getNative());
     DCError::AssertSuccess(info.Env(), status);
 
     return IOStream::constructor.New(
         {
             Napi::External<dc_iostream_t>::New(info.Env(), iostream),
         });
+}
+
+dc_status_t SerialTransport::getNative(dc_iostream_t **iostream, dc_context_t *ctx)
+{
+    auto name = dc_serial_device_get_name(device);
+    return dc_serial_open(iostream, ctx, name);
 }

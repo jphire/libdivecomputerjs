@@ -97,13 +97,18 @@ Napi::Value BluetoothTransport::open(const Napi::CallbackInfo &info)
 
     auto context = Napi::ObjectWrap<Context>::Unwrap(info[0].As<Napi::Object>());
 
-    auto address = dc_bluetooth_device_get_address(device);
     dc_iostream_t *iostream;
-    auto status = dc_bluetooth_open(&iostream, context->getNative(), address, 0);
+    auto status = getNative(&iostream, context->getNative());
     DCError::AssertSuccess(info.Env(), status);
 
     return IOStream::constructor.New(
         {
             Napi::External<dc_iostream_t>::New(info.Env(), iostream),
         });
+}
+
+dc_status_t BluetoothTransport::getNative(dc_iostream_t **iostream, dc_context_t *ctx)
+{
+    auto address = dc_bluetooth_device_get_address(device);
+    return dc_bluetooth_open(iostream, ctx, address, 0);
 }

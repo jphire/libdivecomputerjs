@@ -1,6 +1,7 @@
 #include "device.h"
 #include "errors/DCError.h"
 #include "enums/eventtypes.h"
+#include "values/eventdata.h"
 #include "context.h"
 #include "descriptor.h"
 #include "iostream.h"
@@ -23,7 +24,7 @@ void Device::Init(Napi::Env env, Napi::Object exports)
 Device::Device(const Napi::CallbackInfo &info)
     : Napi::ObjectWrap<Device>(info)
 {
-    if (info.Length() != 3 || !info[0].IsObject() || !info[1].IsObject())
+    if (info.Length() != 3 || !info[0].IsObject() || !info[1].IsObject() || !info[2].IsObject())
     {
         throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {context}, {description} and {iostream}.");
     }
@@ -140,76 +141,6 @@ void Device::setEvents(const Napi::CallbackInfo &info)
     eventCallback = Napi::Persistent(info[1].As<Napi::Function>());
 
     dc_device_set_events(device, events, nativeEventCallback, this);
-}
-
-Napi::Value wrapClockEventData(Napi::Env env, const dc_event_clock_t *clock)
-{
-    auto clockObject = Napi::Object::New(env);
-
-    clockObject.Set("devtime", clock->devtime);
-    clockObject.Set("systime", clock->systime);
-
-    return clockObject;
-}
-
-Napi::Value wrapProgressEventData(Napi::Env env, const dc_event_progress_t *progress)
-{
-    auto progressObject = Napi::Object::New(env);
-
-    progressObject.Set("current", progress->current);
-    progressObject.Set("maximum", progress->maximum);
-
-    return progressObject;
-}
-
-Napi::Value wrapVendorEventData(Napi::Env env, const dc_event_vendor_t *vendor)
-{
-    return Napi::ArrayBuffer::New(env, const_cast<unsigned char *>(vendor->data), vendor->size);
-}
-
-Napi::Value wrapDevInfoEventData(Napi::Env env, const dc_event_devinfo_t *devinfo)
-{
-    auto progressObject = Napi::Object::New(env);
-
-    progressObject.Set("firmware", devinfo->firmware);
-    progressObject.Set("model", devinfo->model);
-    progressObject.Set("serial", devinfo->serial);
-
-    return progressObject;
-}
-
-Napi::Value wrapEventData(Napi::Env env, dc_event_type_t event, const void *data)
-{
-    auto eventObject = Napi::Object::New(env);
-    switch (event)
-    {
-    case DC_EVENT_CLOCK:
-        return wrapClockEventData(env, reinterpret_cast<const dc_event_clock_t *>(data));
-
-    case DC_EVENT_PROGRESS:
-        return wrapProgressEventData(env, reinterpret_cast<const dc_event_progress_t *>(data));
-
-    case DC_EVENT_WAITING:
-        return env.Undefined();
-
-    case DC_EVENT_VENDOR:
-        return wrapVendorEventData(env, reinterpret_cast<const dc_event_vendor_t *>(data));
-
-    case DC_EVENT_DEVINFO:
-        return wrapDevInfoEventData(env, reinterpret_cast<const dc_event_devinfo_t *>(data));
-    }
-
-    char buffer[128];
-    sprintf(buffer, "Invalid event type %u", event);
-    throw Napi::TypeError::New(env, buffer);
-}
-
-Napi::Object wrapEvent(Napi::Env env, dc_event_type_t event, const void *data)
-{
-    auto eventObject = Napi::Object::New(env);
-    eventObject.Set("type", translateEvent(env, event));
-    eventObject.Set("data", wrapEventData(env, event, data));
-    return eventObject;
 }
 
 void Device::nativeEventCallback(dc_device_t *d, dc_event_type_t event, const void *data, void *userdata)

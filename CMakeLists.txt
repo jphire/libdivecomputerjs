@@ -8,7 +8,7 @@ project (libdivecomputerjs)
 
 include(cmake/libdivecomputer.cmake)
 
-file(GLOB_RECURSE SOURCE_FILES src/*.cc src/transports/*.cc)
+file(GLOB_RECURSE SOURCE_FILES src/*.cc)
 
 set_directory_properties(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/deps)
 include_directories(${CMAKE_JS_INC})

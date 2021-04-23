@@ -88,10 +88,9 @@ Napi::Value IRDATransport::open(const Napi::CallbackInfo &info)
     }
 
     auto context = Napi::ObjectWrap<Context>::Unwrap(info[0].As<Napi::Object>());
-    auto address = dc_irda_device_get_address(device);
 
     dc_iostream_t *iostream;
-    auto status = dc_irda_open(&iostream, context->getNative(), address, 1);
+    auto status = getNative(&iostream, context->getNative());
     DCError::AssertSuccess(info.Env(), status);
 
     return IOStream::constructor.New(
@@ -117,4 +116,10 @@ Napi::Value IRDATransport::toString(const Napi::CallbackInfo &info)
     char buffer[128];
     snprintf(buffer, 128, "%08x %s", dc_irda_device_get_address(device), dc_irda_device_get_name(device));
     return Napi::String::New(info.Env(), buffer);
+}
+
+dc_status_t IRDATransport::getNative(dc_iostream_t **iostream, dc_context_t *ctx)
+{
+    auto address = dc_irda_device_get_address(device);
+    return dc_irda_open(iostream, ctx, address, 1);
 }

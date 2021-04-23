@@ -11,6 +11,7 @@ public:
     Context(const Napi::CallbackInfo &info);
     ~Context();
     void setLogLevel(const Napi::CallbackInfo &info, const Napi::Value &logLevel);
+    dc_loglevel_t getNativeLogLevel();
     Napi::Value getLogLevel(const Napi::CallbackInfo &info);
     Napi::Value getTransports(const Napi::CallbackInfo &info);
     void setLogCallback(const Napi::CallbackInfo &info);
@@ -18,11 +19,12 @@ public:
 
     void internalCallLogCallback(dc_loglevel_t logLevel, const char *msg);
     dc_context_t *getNative();
+    Napi::FunctionReference callback;
 
 private:
     dc_context_t *context = NULL;
     dc_loglevel_t logLevel = DC_LOGLEVEL_ERROR;
-    Napi::FunctionReference callback;
+
     Napi::String getLogLevel(Napi::CallbackInfo);
     void setLogLevel(Napi::CallbackInfo);
     void setLogCallback(Napi::CallbackInfo);

@@ -18,6 +18,8 @@
 #include "transports/bluetooth.h"
 #include "iostream.h"
 #include "parser.h"
+#include "asyncdevicereader.h"
+#include "asyncdevicereaderworker.h"
 
 using namespace Napi;
 
@@ -32,6 +34,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports)
     Device::Init(env, exports);
     Parser::Init(env, exports);
     IOStream::Init(env, exports);
+    AsyncDeviceReader::Init(env, exports);
 
     exports.Set(Napi::String::New(env, "version"), Napi::Function::New(env, getVersion));
     exports.Set(Napi::String::New(env, "LogLevel"), getLogLevels(env));

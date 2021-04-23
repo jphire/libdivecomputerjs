@@ -100,7 +100,7 @@ Napi::Value USBHIDTransport::open(const Napi::CallbackInfo &info)
     auto context = Napi::ObjectWrap<Context>::Unwrap(info[0].As<Napi::Object>());
 
     dc_iostream_t *iostream;
-    auto status = dc_usbhid_open(&iostream, context->getNative(), device);
+    auto status = getNative(&iostream, context->getNative());
     DCError::AssertSuccess(info.Env(), status);
 
     return IOStream::constructor.New(
@@ -115,4 +115,9 @@ Napi::Value USBHIDTransport::toString(const Napi::CallbackInfo &info)
     snprintf(buffer, 128, "PID: %u; VID: %u", dc_usbhid_device_get_pid(device), dc_usbhid_device_get_vid(device));
 
     return Napi::String::New(info.Env(), buffer);
+}
+
+dc_status_t USBHIDTransport::getNative(dc_iostream_t **iostream, dc_context_t *ctx)
+{
+    return dc_usbhid_open(iostream, ctx, device);
 }

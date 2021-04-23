@@ -55,6 +55,11 @@ void Context::setLogLevel(const Napi::CallbackInfo &info, const Napi::Value &log
     dc_context_set_loglevel(context, logLevel);
 }
 
+dc_loglevel_t Context::getNativeLogLevel()
+{
+    return logLevel;
+}
+
 void Context::setLogCallback(const Napi::CallbackInfo &info)
 {
     if (info.Length() != 1 || !info[0].IsFunction())
