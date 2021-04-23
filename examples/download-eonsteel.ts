@@ -25,12 +25,6 @@ context.onLog((lvl, msg) => {
 });
 context.logLevel = LogLevel.Warning;
 
-const context2 = new Context();
-context.onLog((lvl, msg) => {
-    console.log(`[CTX2][Log][${lvl}]: ${msg}`);
-});
-context.logLevel = LogLevel.Warning;
-
 const eonSteel = getEonSteel();
 
 if (eonSteel === undefined) {
@@ -48,10 +42,11 @@ console.log(`Found device ${usbhid.toString()}`);
 const runner = new AsyncDeviceReader();
 runner.setContext(context);
 runner.setDescriptor(eonSteel);
-runner.setEvents([EventType.Progress], console.log);
 runner.setTransport(usbhid);
 
-runner.setDive((dive, fingerprint) =>
+runner.onEvents([EventType.Progress], console.log);
+runner.onDive((dive, fingerprint) =>
     console.log(fingerprint.toString('base64'))
 );
-runner.read(() => console.log('Done'));
+
+runner.read((err) => console.log('Done', err));

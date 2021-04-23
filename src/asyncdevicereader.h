@@ -10,8 +10,8 @@ public:
     void setDescriptor(const Napi::CallbackInfo &info);
     void setContext(const Napi::CallbackInfo &info);
     void setTransport(const Napi::CallbackInfo &info);
-    void setEvents(const Napi::CallbackInfo &info);
-    void setDive(const Napi::CallbackInfo &info);
+    void setEventsCallback(const Napi::CallbackInfo &info);
+    void setDiveCallback(const Napi::CallbackInfo &info);
     void read(const Napi::CallbackInfo &info);
 
 private:

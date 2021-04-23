@@ -18,8 +18,8 @@ public:
     void setDescriptor(Descriptor *descriptor);
     void setContext(Context *context);
     void setTransport(const Napi::Object &transport);
-    void setEvents(unsigned int events, const Napi::Function &callback);
-    void setDive(const Napi::Function &dive);
+    void setEventsCallback(unsigned int events, const Napi::Function &callback);
+    void setDiveCallback(const Napi::Function &dive);
 
 private:
     void

@@ -11,8 +11,8 @@ void AsyncDeviceReader::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod<&AsyncDeviceReader::setDescriptor>("setDescriptor"),
             InstanceMethod<&AsyncDeviceReader::setContext>("setContext"),
             InstanceMethod<&AsyncDeviceReader::setTransport>("setTransport"),
-            InstanceMethod<&AsyncDeviceReader::setEvents>("setEvents"),
-            InstanceMethod<&AsyncDeviceReader::setDive>("setDive"),
+            InstanceMethod<&AsyncDeviceReader::setEventsCallback>("onEvents"),
+            InstanceMethod<&AsyncDeviceReader::setDiveCallback>("onDive"),
             InstanceMethod<&AsyncDeviceReader::read>("read"),
         });
 
@@ -39,7 +39,7 @@ void AsyncDeviceReader::setTransport(const Napi::CallbackInfo &info)
     transport = Napi::Persistent(info[0].ToObject());
 }
 
-void AsyncDeviceReader::setEvents(const Napi::CallbackInfo &info)
+void AsyncDeviceReader::setEventsCallback(const Napi::CallbackInfo &info)
 {
     if (!info[0].IsArray())
     {
@@ -50,7 +50,7 @@ void AsyncDeviceReader::setEvents(const Napi::CallbackInfo &info)
     eventCallback = Napi::Persistent(info[1].As<Napi::Function>());
 }
 
-void AsyncDeviceReader::setDive(const Napi::CallbackInfo &info)
+void AsyncDeviceReader::setDiveCallback(const Napi::CallbackInfo &info)
 {
     diveCallback = Napi::Persistent(info[0].As<Napi::Function>());
 }
@@ -69,12 +69,12 @@ void AsyncDeviceReader::read(const Napi::CallbackInfo &info)
 
     if (diveCallback == NULL)
     {
-        throw Napi::Error::New(info.Env(), "Unable to start reading without diveCallback, use setDive before reading");
+        throw Napi::Error::New(info.Env(), "Unable to start reading without diveCallback, use setDiveCallback before reading");
     }
 
     if (eventCallback == NULL)
     {
-        throw Napi::Error::New(info.Env(), "Unable to start reading without events, use setEvents before reading");
+        throw Napi::Error::New(info.Env(), "Unable to start reading without events, use setEventsCallback before reading");
     }
 
     if (transport == NULL)
@@ -85,17 +85,11 @@ void AsyncDeviceReader::read(const Napi::CallbackInfo &info)
     auto callback = info[0].As<Napi::Function>();
 
     auto reader = new AsyncDeviceReaderWorker(callback);
-    printf("ctx\n");
     reader->setContext(context);
-    printf("descr\n");
     reader->setDescriptor(descriptor);
-    printf("setdive\n");
-    reader->setDive(diveCallback.Value());
-    printf("setevents\n");
-    reader->setEvents(events, eventCallback.Value());
-    printf("setTransport\n");
+    reader->setDiveCallback(diveCallback.Value());
+    reader->setEventsCallback(events, eventCallback.Value());
     reader->setTransport(transport.Value());
 
-    printf("read queue\n");
     reader->Queue();
 }

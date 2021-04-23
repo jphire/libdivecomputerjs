@@ -71,11 +71,9 @@ declare module 'libdivecomputerjs' {
                 | IRDATransport
                 | BluetoothTranport
         ): void;
-        setEvents(events: EventType[], callback: EventCallback): void;
-        setDive(
-            callback: (diveData: Buffer, fingerprint: Buffer) => void
-        ): void;
-        read(cb: () => void): void;
+        onEvents(events: EventType[], callback: EventCallback): void;
+        onDive(callback: (diveData: Buffer, fingerprint: Buffer) => void): void;
+        read(cb: (err?: Error) => void): void;
     }
 
     export function test(

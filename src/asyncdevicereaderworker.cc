@@ -66,7 +66,7 @@ void AsyncDeviceReaderWorker::setTransport(const Napi::Object &transport)
     this->transportRef = Napi::Persistent(transport);
 }
 
-void AsyncDeviceReaderWorker::setEvents(unsigned int events, const Napi::Function &callback)
+void AsyncDeviceReaderWorker::setEventsCallback(unsigned int events, const Napi::Function &callback)
 {
     this->events = events;
     if (tsfEventdata != NULL)
@@ -82,7 +82,7 @@ void AsyncDeviceReaderWorker::setEvents(unsigned int events, const Napi::Functio
         1);
 }
 
-void AsyncDeviceReaderWorker::setDive(const Napi::Function &dive)
+void AsyncDeviceReaderWorker::setDiveCallback(const Napi::Function &diveCallback)
 {
     if (tsfDivedata != NULL)
     {
@@ -91,8 +91,8 @@ void AsyncDeviceReaderWorker::setDive(const Napi::Function &dive)
 
     tsfDivedata = Napi::ThreadSafeFunction::New(
         Env(),
-        dive,
-        "async reader dive",
+        diveCallback,
+        "async reader diveCallback",
         0,
         1);
 }
