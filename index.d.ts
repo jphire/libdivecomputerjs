@@ -61,6 +61,17 @@ declare module 'libdivecomputerjs' {
         Salt = 'Salt',
     }
 
+    export interface GasMix {
+        helium: number;
+        oxygen: number;
+        nitrogen: number;
+    }
+
+    export interface Salinity {
+        density: number;
+        type: WaterType;
+    }
+
     export class AsyncDeviceReader {
         setContext(context: Context): void;
         setDescriptor(descriptor: Descriptor): void;
@@ -270,13 +281,9 @@ declare module 'libdivecomputerjs' {
         setData(data: Buffer): void;
         getField(field: NumbericFields): undefined | number;
         getField(field: FieldType.DiveMode): undefined | DiveMode;
-        getField(
-            field: FieldType.Salinity
-        ): undefined | { density: number; type: WaterType };
-        getField(field: FieldType.Tank): undefined | TankValue;
-        getField(
-            field: FieldType.GasMix
-        ): undefined | { helium: number; oxygen: number; nitrogen: number };
+        getField(field: FieldType.Salinity): undefined | Salinity;
+        getField(field: FieldType.Tank, index: number): undefined | TankValue;
+        getField(field: FieldType.GasMix, index: number): undefined | GasMix;
         getDatetime(): string;
         samplesForeach(callback: (sample: Sample) => void): void;
     }

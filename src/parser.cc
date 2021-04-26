@@ -197,6 +197,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
 
     auto env = info.Env();
     auto field = translateFieldType(info.Env(), info[0].ToString());
+    auto index = info[1].IsNumber() ? info[1].ToNumber().Int32Value() : 0;
     dc_status_t status;
 
     switch (field)
@@ -226,7 +227,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
         dc_tank_t tank;
         emptyTank(tank);
 
-        status = dc_parser_get_field(parser, field, 0, &tank);
+        status = dc_parser_get_field(parser, field, index, &tank);
         ReturnUndefinedOnUnsupported(status, info.Env());
         DCError::AssertSuccess(env, status);
 
@@ -236,7 +237,7 @@ Napi::Value Parser::getField(const Napi::CallbackInfo &info)
         dc_gasmix_t gasmix;
         emptyGasmix(gasmix);
 
-        status = dc_parser_get_field(parser, field, 0, &gasmix);
+        status = dc_parser_get_field(parser, field, index, &gasmix);
         ReturnUndefinedOnUnsupported(status, info.Env());
         DCError::AssertSuccess(env, status);
 
