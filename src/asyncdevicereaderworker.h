@@ -20,6 +20,7 @@ public:
     void setTransport(const Napi::Object &transport);
     void setEventsCallback(unsigned int events, const Napi::Function &callback);
     void setDiveCallback(const Napi::Function &dive);
+    void setDeviceCallback(const Napi::Function &dive);
 
 private:
     void
@@ -29,7 +30,8 @@ private:
     Napi::ThreadSafeFunction tsfDivedata;
     Napi::ThreadSafeFunction tsfLogdata;
     Napi::ThreadSafeFunction tsfEventdata;
-    Napi::FunctionReference diveCallback;
+    Napi::ThreadSafeFunction tsfDevicedata;
+    ;
     Context *context = NULL;
     NativeTransport *transport = NULL;
     Descriptor *descriptor = NULL;
@@ -40,4 +42,5 @@ private:
     static void callWithDivedata(Napi::Env env, Napi::Function jsCallback, Divedata *data);
     static void callWithLogdata(Napi::Env env, Napi::Function jsCallback, Logdata *data);
     static void callWithEventdata(Napi::Env env, Napi::Function jsCallback, Eventdata *data);
+    static void callWithDevicedata(Napi::Env env, Napi::Function jsCallback, dc_device_t *data);
 };

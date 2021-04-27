@@ -13,7 +13,9 @@ void AsyncDeviceReader::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod<&AsyncDeviceReader::setTransport>("setTransport"),
             InstanceMethod<&AsyncDeviceReader::setEventsCallback>("onEvents"),
             InstanceMethod<&AsyncDeviceReader::setDiveCallback>("onDive"),
+            InstanceMethod<&AsyncDeviceReader::setDeviceCallback>("onDevice"),
             InstanceMethod<&AsyncDeviceReader::read>("read"),
+
         });
 
     exports.Set("AsyncDeviceReader", func);
@@ -55,6 +57,11 @@ void AsyncDeviceReader::setDiveCallback(const Napi::CallbackInfo &info)
     diveCallback = Napi::Persistent(info[0].As<Napi::Function>());
 }
 
+void AsyncDeviceReader::setDeviceCallback(const Napi::CallbackInfo &info)
+{
+    deviceCallback = Napi::Persistent(info[0].As<Napi::Function>());
+}
+
 void AsyncDeviceReader::read(const Napi::CallbackInfo &info)
 {
     if (context == NULL)
@@ -77,6 +84,11 @@ void AsyncDeviceReader::read(const Napi::CallbackInfo &info)
         throw Napi::Error::New(info.Env(), "Unable to start reading without events, use setEventsCallback before reading");
     }
 
+    if (deviceCallback == NULL)
+    {
+        throw Napi::Error::New(info.Env(), "Unable to start reading without events, use setEventsCallback before reading");
+    }
+
     if (transport == NULL)
     {
         throw Napi::Error::New(info.Env(), "Unable to start reading without transport, use setTransport before reading");
@@ -88,6 +100,7 @@ void AsyncDeviceReader::read(const Napi::CallbackInfo &info)
     reader->setContext(context);
     reader->setDescriptor(descriptor);
     reader->setDiveCallback(diveCallback.Value());
+    reader->setDeviceCallback(deviceCallback.Value());
     reader->setEventsCallback(events, eventCallback.Value());
     reader->setTransport(transport.Value());
 

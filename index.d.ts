@@ -84,6 +84,7 @@ declare module 'libdivecomputerjs' {
         ): void;
         onEvents(events: EventType[], callback: EventCallback): void;
         onDive(callback: (diveData: Buffer, fingerprint: Buffer) => void): void;
+        onDevice(callback: (device: Device) => void): void;
         read(cb: (err?: Error) => void): void;
     }
 
@@ -249,6 +250,10 @@ declare module 'libdivecomputerjs' {
         | SampleInstance<
               SampleType.Deco,
               { depth: number; time: number; type: number }
+          >
+        | SampleInstance<
+              SampleType.Event,
+              { type: SampleEventType; flags: number; value: number }
           >;
 
     type NumbericFields =

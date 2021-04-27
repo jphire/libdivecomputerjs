@@ -6,6 +6,8 @@
 #include "descriptor.h"
 #include "iostream.h"
 
+Napi::FunctionReference Device::constructor;
+
 void Device::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::Function func = DefineClass(
@@ -18,28 +20,39 @@ void Device::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod<&Device::foreach>("foreach"),
         });
 
+    constructor = Napi::Persistent(func);
+    constructor.SuppressDestruct();
+
     exports.Set("Device", func);
 }
 
 Device::Device(const Napi::CallbackInfo &info)
     : Napi::ObjectWrap<Device>(info)
 {
-    if (info.Length() != 3 || !info[0].IsObject() || !info[1].IsObject() || !info[2].IsObject())
+    if (info.Length() == 1 && info[0].IsExternal())
     {
-        throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {context}, {description} and {iostream}.");
+        borrowed = true;
+        device = info[0].As<Napi::External<dc_device_t>>().Data();
     }
+    else if (info.Length() == 3 && info[0].IsObject() && info[1].IsObject() && info[2].IsObject())
+    {
+        auto context = Napi::ObjectWrap<Context>::Unwrap(info[0].ToObject());
+        auto descriptor = Napi::ObjectWrap<Descriptor>::Unwrap(info[1].ToObject());
+        auto iostream = Napi::ObjectWrap<IOStream>::Unwrap(info[2].ToObject());
 
-    auto context = Napi::ObjectWrap<Context>::Unwrap(info[0].ToObject());
-    auto descriptor = Napi::ObjectWrap<Descriptor>::Unwrap(info[1].ToObject());
-    auto iostream = Napi::ObjectWrap<IOStream>::Unwrap(info[2].ToObject());
-
-    auto status = dc_device_open(&device, context->getNative(), descriptor->getNative(), iostream->getNative());
-    DCError::AssertSuccess(info.Env(), status);
+        borrowed = false;
+        auto status = dc_device_open(&device, context->getNative(), descriptor->getNative(), iostream->getNative());
+        DCError::AssertSuccess(info.Env(), status);
+    }
+    else
+    {
+        throw Napi::TypeError::New(info.Env(), "Invalid arguments for Device. expected {Context}, {Descriptor}, {IOStream}.");
+    }
 }
 
 Device::~Device()
 {
-    if (device != NULL)
+    if (borrowed == true && device != NULL)
     {
         dc_device_close(device);
         device = NULL;

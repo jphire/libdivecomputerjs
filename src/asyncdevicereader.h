@@ -12,6 +12,7 @@ public:
     void setTransport(const Napi::CallbackInfo &info);
     void setEventsCallback(const Napi::CallbackInfo &info);
     void setDiveCallback(const Napi::CallbackInfo &info);
+    void setDeviceCallback(const Napi::CallbackInfo &info);
     void read(const Napi::CallbackInfo &info);
 
 private:
@@ -19,6 +20,7 @@ private:
     Context *context = NULL;
     Napi::ObjectReference transport;
     Napi::FunctionReference diveCallback;
+    Napi::FunctionReference deviceCallback;
     unsigned int events = 0;
     Napi::FunctionReference eventCallback;
 };

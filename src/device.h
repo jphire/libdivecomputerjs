@@ -7,6 +7,8 @@ class Device : public Napi::ObjectWrap<Device>
 {
 public:
     static void Init(Napi::Env env, Napi::Object exports);
+    static Napi::FunctionReference constructor;
+
     Device(const Napi::CallbackInfo &);
     ~Device();
     void foreach (const Napi::CallbackInfo &);
@@ -16,6 +18,8 @@ public:
     dc_device_t *getNative();
 
 private:
+    bool borrowed = false;
+
     Napi::FunctionReference eventCallback;
     Napi::FunctionReference cancelCallback;
     Napi::FunctionReference foreachCallback;

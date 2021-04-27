@@ -97,6 +97,21 @@ void AsyncDeviceReaderWorker::setDiveCallback(const Napi::Function &diveCallback
         1);
 }
 
+void AsyncDeviceReaderWorker::setDeviceCallback(const Napi::Function &deviceCallback)
+{
+    if (tsfDevicedata != NULL)
+    {
+        tsfDevicedata.Release();
+    }
+
+    tsfDivedata = Napi::ThreadSafeFunction::New(
+        Env(),
+        deviceCallback,
+        "async reader deviceCallback",
+        0,
+        1);
+}
+
 void AsyncDeviceReaderWorker::OnWorkComplete(Napi::Env env, napi_status status)
 {
     Napi::AsyncWorker::OnWorkComplete(env, status);
@@ -129,6 +144,8 @@ void AsyncDeviceReaderWorker::Execute()
     dc_device_t *device;
     status = dc_device_open(&device, context, descriptor, iostream);
     DCError::AssertSuccess(status);
+
+    tsfDevicedata.BlockingCall(device, callWithDevicedata);
 
     dc_device_set_events(
         device, events, [](dc_device_t *d, dc_event_type_t event, const void *data, void *userdata) {
@@ -179,4 +196,10 @@ void AsyncDeviceReaderWorker::callWithLogdata(Napi::Env env, Napi::Function jsCa
     });
 
     delete data;
+}
+
+void AsyncDeviceReaderWorker::callWithDevicedata(Napi::Env env, Napi::Function jsCallback, dc_device_t *data)
+{
+    auto device = Device::constructor.New({Napi::External<dc_device_t>::New(env, data)});
+    jsCallback.Call({device});
 }
