@@ -190,9 +190,9 @@ Napi::Value Parser::getDatetime(const Napi::CallbackInfo &info)
 
 Napi::Value Parser::getField(const Napi::CallbackInfo &info)
 {
-    if (info.Length() != 1 || !info[0].IsString())
+    if (info.Length() == 0 || info.Length() > 2 || !info[0].IsString())
     {
-        throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {string} where string is any of FieldTypes");
+        throw Napi::TypeError::New(info.Env(), "Invalid arguments, expected {string} where string is any of FieldTypes and optionally {index}");
     }
 
     auto env = info.Env();
