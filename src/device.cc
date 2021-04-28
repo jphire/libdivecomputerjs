@@ -52,7 +52,7 @@ Device::Device(const Napi::CallbackInfo &info)
 
 Device::~Device()
 {
-    if (borrowed == true && device != NULL)
+    if (borrowed == false && device != NULL)
     {
         dc_device_close(device);
         device = NULL;

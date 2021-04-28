@@ -104,7 +104,7 @@ void AsyncDeviceReaderWorker::setDeviceCallback(const Napi::Function &deviceCall
         tsfDevicedata.Release();
     }
 
-    tsfDivedata = Napi::ThreadSafeFunction::New(
+    tsfDevicedata = Napi::ThreadSafeFunction::New(
         Env(),
         deviceCallback,
         "async reader deviceCallback",
@@ -118,6 +118,7 @@ void AsyncDeviceReaderWorker::OnWorkComplete(Napi::Env env, napi_status status)
     tsfDivedata.Release();
     tsfEventdata.Release();
     tsfLogdata.Release();
+    tsfDevicedata.Release();
 }
 
 void AsyncDeviceReaderWorker::Execute()

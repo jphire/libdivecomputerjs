@@ -48,5 +48,6 @@ runner.onEvents([EventType.Progress], console.log);
 runner.onDive((dive, fingerprint) =>
     console.log(fingerprint.toString('base64'))
 );
+runner.onDevice((device) => console.log(device));
 
 runner.read((err) => console.log('Done', err));
