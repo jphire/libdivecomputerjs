@@ -88,11 +88,6 @@ declare module 'libdivecomputerjs' {
         read(cb: (err?: Error) => void): void;
     }
 
-    export function test(
-        dive: (dive: Buffer, fingerprint: Buffer) => void,
-        cb: () => void
-    );
-
     export enum SampleType {
         Bearing = 'Bearing',
         CNS = 'CNS',
@@ -223,8 +218,8 @@ declare module 'libdivecomputerjs' {
     export class Context {
         logLevel: LogLevel;
         readonly transports: Transport[];
-        log(logLevel: LogLevel, message: string);
-        onLog(cb: (logLevel: LogLevel, message: string) => void);
+        log(logLevel: LogLevel, message: string): void;
+        onLog(cb: (logLevel: LogLevel, message: string) => void): void;
     }
 
     type SampleInstance<T extends SampleType, K> = {
