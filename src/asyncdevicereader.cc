@@ -14,6 +14,7 @@ void AsyncDeviceReader::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod<&AsyncDeviceReader::setEventsCallback>("onEvents"),
             InstanceMethod<&AsyncDeviceReader::setDiveCallback>("onDive"),
             InstanceMethod<&AsyncDeviceReader::setDeviceCallback>("onDevice"),
+            InstanceMethod<&AsyncDeviceReader::setFingerprint>("setFingerprint"),
             InstanceMethod<&AsyncDeviceReader::read>("read"),
 
         });
@@ -62,6 +63,21 @@ void AsyncDeviceReader::setDeviceCallback(const Napi::CallbackInfo &info)
     deviceCallback = Napi::Persistent(info[0].As<Napi::Function>());
 }
 
+void AsyncDeviceReader::setFingerprint(const Napi::CallbackInfo &info)
+{
+    if (!info[0].IsBuffer())
+    {
+        throw Napi::TypeError::New(info.Env(), "Expected first argument to be a buffer");
+    }
+    auto value = info[0].As<Napi::Buffer<unsigned char>>();
+    fingerprint = Napi::Persistent(value);
+
+    if (worker != NULL)
+    {
+        worker->setFingerprint(fingerprint.Value().Data(), fingerprint.Value().Length());
+    }
+}
+
 void AsyncDeviceReader::read(const Napi::CallbackInfo &info)
 {
     if (context == NULL)
@@ -96,13 +112,18 @@ void AsyncDeviceReader::read(const Napi::CallbackInfo &info)
 
     auto callback = info[0].As<Napi::Function>();
 
-    auto reader = new AsyncDeviceReaderWorker(callback);
-    reader->setContext(context);
-    reader->setDescriptor(descriptor);
-    reader->setDiveCallback(diveCallback.Value());
-    reader->setDeviceCallback(deviceCallback.Value());
-    reader->setEventsCallback(events, eventCallback.Value());
-    reader->setTransport(transport.Value());
+    worker = new AsyncDeviceReaderWorker(callback);
+    worker->setContext(context);
+    worker->setDescriptor(descriptor);
+    worker->setDiveCallback(diveCallback.Value());
+    worker->setDeviceCallback(deviceCallback.Value());
+    worker->setEventsCallback(events, eventCallback.Value());
+    worker->setTransport(transport.Value());
 
-    reader->Queue();
+    if (!fingerprint.IsEmpty())
+    {
+        worker->setFingerprint(fingerprint.Value().Data(), fingerprint.Value().Length());
+    }
+
+    worker->Queue();
 }

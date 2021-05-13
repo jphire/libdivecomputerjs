@@ -10,6 +10,12 @@
 #include <chrono>
 #include <thread>
 
+struct fingerprint_t
+{
+    unsigned int size = 0;
+    const unsigned char *data = NULL;
+};
+
 class AsyncDeviceReaderWorker : public Napi::AsyncWorker
 {
 public:
@@ -18,6 +24,7 @@ public:
     void setDescriptor(Descriptor *descriptor);
     void setContext(Context *context);
     void setTransport(const Napi::Object &transport);
+    void setFingerprint(const unsigned char *fingerprint, unsigned int fsize);
     void setEventsCallback(unsigned int events, const Napi::Function &callback);
     void setDiveCallback(const Napi::Function &dive);
     void setDeviceCallback(const Napi::Function &dive);
@@ -31,12 +38,14 @@ private:
     Napi::ThreadSafeFunction tsfLogdata;
     Napi::ThreadSafeFunction tsfEventdata;
     Napi::ThreadSafeFunction tsfDevicedata;
-    ;
+
     Context *context = NULL;
     NativeTransport *transport = NULL;
     Descriptor *descriptor = NULL;
+    dc_device_t *device = NULL;
     Napi::ObjectReference transportRef;
     unsigned int events = 0;
+    fingerprint_t fingerprint;
 
     static int nativeForeachCallback(const unsigned char *data, unsigned int size, const unsigned char *fingerprint, unsigned int fsize, void *userdata);
     static void callWithDivedata(Napi::Env env, Napi::Function jsCallback, Divedata *data);

@@ -5,7 +5,6 @@ import {
     Context,
     EventType,
     LogLevel,
-    test,
     USBHIDTransport,
     version,
 } from 'libdivecomputerjs';
@@ -21,7 +20,7 @@ console.log(`libdivecomputer v${version()}`);
 
 const context = new Context();
 context.onLog((lvl, msg) => {
-    console.log(`[CTX1][Log][${lvl}]: ${msg}`);
+    console.log(`[CTX][Log][${lvl}]: ${msg}`);
 });
 context.logLevel = LogLevel.Warning;
 
@@ -44,7 +43,17 @@ runner.setContext(context);
 runner.setDescriptor(eonSteel);
 runner.setTransport(usbhid);
 
-runner.onEvents([EventType.Progress], console.log);
+runner.onEvents([EventType.Progress, EventType.DevInfo], (args) => {
+    switch (args.type) {
+        case EventType.Progress:
+            console.log(args);
+            break;
+        case EventType.DevInfo:
+            console.log('device: ', args.data.serial);
+            runner.setFingerprint(Buffer.from('E6RbXw==', 'base64'));
+            break;
+    }
+});
 runner.onDive((dive, fingerprint) =>
     console.log(fingerprint.toString('base64'))
 );

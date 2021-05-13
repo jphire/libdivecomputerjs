@@ -85,6 +85,7 @@ declare module 'libdivecomputerjs' {
         onEvents(events: EventType[], callback: EventCallback): void;
         onDive(callback: (diveData: Buffer, fingerprint: Buffer) => void): void;
         onDevice(callback: (device: Device) => void): void;
+        setFingerprint(fingerprint: Buffer): void;
         read(cb: (err?: Error) => void): void;
     }
 

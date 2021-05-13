@@ -1,6 +1,6 @@
 {
   "name": "libdivecomputerjs",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "license": "MIT",
   "types": "index.d.ts",
@@ -9,7 +9,7 @@
     "install": "cmake-js compile",
     "build": "cmake-js build",
     "test": "mocha --require ./tshook.js --recursive  test/**/*.spec.ts",
-    "sample": "ts-node examples/download-eonsteel.ts",
+    "sample": "yarn configure && yarn build && ts-node examples/download-eonsteel.ts",
     "all": "yarn configure && yarn build && yarn test",
     "clean": "(cd build && make clean && cd ..) || cmake-js clean"
   },
