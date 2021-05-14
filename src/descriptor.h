@@ -15,6 +15,7 @@ public:
     Napi::Value getProduct(const Napi::CallbackInfo &);
     Napi::Value getVendor(const Napi::CallbackInfo &);
     Napi::Value getModel(const Napi::CallbackInfo &);
+    Napi::Value getType(const Napi::CallbackInfo &);
     Napi::Value getTransports(const Napi::CallbackInfo &);
 
     dc_descriptor_t *getNative();

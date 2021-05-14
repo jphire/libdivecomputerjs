@@ -39,6 +39,7 @@ Napi::Object Descriptor::Init(Napi::Env env, Napi::Object exports)
             InstanceAccessor<&Descriptor::getProduct>("product"),
             InstanceAccessor<&Descriptor::getVendor>("vendor"),
             InstanceAccessor<&Descriptor::getModel>("model"),
+            InstanceAccessor<&Descriptor::getType>("type"),
             InstanceAccessor<&Descriptor::getTransports>("transports"),
             StaticMethod<&Descriptor::iterate>("iterate"),
         });
@@ -69,6 +70,11 @@ Napi::Value Descriptor::getModel(const Napi::CallbackInfo &info)
 Napi::Value Descriptor::getTransports(const Napi::CallbackInfo &info)
 {
     return translateTransports(info.Env(), dc_descriptor_get_transports(descriptor));
+}
+
+Napi::Value Descriptor::getType(const Napi::CallbackInfo &info)
+{
+    return Napi::Number::New(info.Env(), dc_descriptor_get_type(descriptor));
 }
 
 Napi::Object wrapDescriptor(Napi::Env env, dc_descriptor_t *descriptor)

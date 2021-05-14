@@ -141,6 +141,7 @@ declare module 'libdivecomputerjs' {
         readonly vendor: string;
         readonly model: number;
         readonly transports: Transport[];
+        readonly type: number;
     }
 
     export class USBHIDTransport {
