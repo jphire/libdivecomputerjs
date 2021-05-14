@@ -41,9 +41,10 @@ Napi::Value wrapVendorEventData(Napi::Env env, const dc_event_vendor_t *vendor)
     return Napi::ArrayBuffer::New(env, const_cast<unsigned char *>(vendor->data), vendor->size);
 }
 
-Napi::Value wrapDevInfoEventData(Napi::Env env, const dc_event_devinfo_t *devinfo)
+Napi::Value wrapDevInfoEventData(Napi::Env env, dc_event_devinfo_t *devinfo)
 {
     auto progressObject = Napi::Object::New(env);
+    printf("fw: %u, ser: %u, mod: %u \n", devinfo->firmware, devinfo->serial, devinfo->model);
 
     progressObject.Set("firmware", devinfo->firmware);
     progressObject.Set("model", devinfo->model);
@@ -54,7 +55,6 @@ Napi::Value wrapDevInfoEventData(Napi::Env env, const dc_event_devinfo_t *devinf
 
 Napi::Value wrapEventData(Napi::Env env, dc_event_type_t event, const void *data)
 {
-    auto eventObject = Napi::Object::New(env);
     switch (event)
     {
     case DC_EVENT_CLOCK:
@@ -70,7 +70,7 @@ Napi::Value wrapEventData(Napi::Env env, dc_event_type_t event, const void *data
         return wrapVendorEventData(env, reinterpret_cast<const dc_event_vendor_t *>(data));
 
     case DC_EVENT_DEVINFO:
-        return wrapDevInfoEventData(env, reinterpret_cast<const dc_event_devinfo_t *>(data));
+        return wrapDevInfoEventData(env, (dc_event_devinfo_t *)(data));
     }
 
     char buffer[128];
@@ -86,24 +86,23 @@ Napi::Object wrapEvent(Napi::Env env, dc_event_type_t event, const void *data)
     return eventObject;
 }
 
-// size_t sizeofEventData(dc_event_type_t event)
-// {
-//     switch (event)
-//     {
-//     case DC_EVENT_CLOCK:
-//         return sizeof(dc_event_clock_t);
-//     case DC_EVENT_DEVINFO:
-//         return sizeof(dc_event_devinfo_t);
-//     case DC_EVENT_PROGRESS:
-//         return sizeof(dc_event_progress_t);
-//     }
-
-//     return 0;
-// }
+size_t sizeofEvent(dc_event_type_t event)
+{
+    switch (event)
+    {
+    case DC_EVENT_DEVINFO:
+        return sizeof(dc_event_devinfo_t);
+    case DC_EVENT_PROGRESS:
+        return sizeof(dc_event_progress_t);
+    case DC_EVENT_CLOCK:
+        return sizeof(dc_event_clock_t);
+    }
+    return 0;
+}
 
 void *copyEventData(dc_event_type_t event, const void *data)
 {
-    auto size = sizeof(data);
+    auto size = sizeofEvent(event);
     auto copiedData = malloc(size);
     memcpy(copiedData, data, size);
 
