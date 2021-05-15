@@ -86,7 +86,7 @@ Napi::Object wrapEvent(Napi::Env env, dc_event_type_t event, const void *data)
     return eventObject;
 }
 
-size_t sizeofEvent(dc_event_type_t event)
+size_t sizeofEvent(dc_event_type_t event, const void *data)
 {
     switch (event)
     {
@@ -96,13 +96,16 @@ size_t sizeofEvent(dc_event_type_t event)
         return sizeof(dc_event_progress_t);
     case DC_EVENT_CLOCK:
         return sizeof(dc_event_clock_t);
+    case DC_EVENT_WAITING:
+        return sizeof(dc_event_clock_t);
+    default:
+        return sizeof(data);
     }
-    return 0;
 }
 
 void *copyEventData(dc_event_type_t event, const void *data)
 {
-    auto size = sizeofEvent(event);
+    auto size = sizeofEvent(event, data);
     auto copiedData = malloc(size);
     memcpy(copiedData, data, size);
 
