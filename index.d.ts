@@ -87,6 +87,7 @@ declare module 'libdivecomputerjs' {
         onDevice(callback: (device: Device) => void): void;
         setFingerprint(fingerprint: Buffer): void;
         read(cb: (err?: Error) => void): void;
+        cancel(): void;
     }
 
     export enum SampleType {

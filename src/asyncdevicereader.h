@@ -15,6 +15,7 @@ public:
     void setDiveCallback(const Napi::CallbackInfo &info);
     void setDeviceCallback(const Napi::CallbackInfo &info);
     void read(const Napi::CallbackInfo &info);
+    void cancel(const Napi::CallbackInfo &info);
 
 private:
     AsyncDeviceReaderWorker *worker = NULL;

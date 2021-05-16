@@ -15,8 +15,8 @@ void AsyncDeviceReader::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod<&AsyncDeviceReader::setDiveCallback>("onDive"),
             InstanceMethod<&AsyncDeviceReader::setDeviceCallback>("onDevice"),
             InstanceMethod<&AsyncDeviceReader::setFingerprint>("setFingerprint"),
+            InstanceMethod<&AsyncDeviceReader::cancel>("cancel"),
             InstanceMethod<&AsyncDeviceReader::read>("read"),
-
         });
 
     exports.Set("AsyncDeviceReader", func);
@@ -76,6 +76,15 @@ void AsyncDeviceReader::setFingerprint(const Napi::CallbackInfo &info)
     {
         worker->setFingerprint(fingerprint.Value().Data(), fingerprint.Value().Length());
     }
+}
+
+void AsyncDeviceReader::cancel(const Napi::CallbackInfo &info)
+{
+    if (worker == NULL)
+    {
+        throw Napi::Error::New(info.Env(), "Unable to cancel, worker has not yet been started");
+    }
+    worker->cancel();
 }
 
 void AsyncDeviceReader::read(const Napi::CallbackInfo &info)

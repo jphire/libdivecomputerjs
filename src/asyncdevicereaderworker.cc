@@ -132,7 +132,8 @@ void AsyncDeviceReaderWorker::setDiveCallback(const Napi::Function &diveCallback
         diveCallback,
         "async reader diveCallback",
         0,
-        1);
+        1,
+        this);
 }
 
 void AsyncDeviceReaderWorker::setDeviceCallback(const Napi::Function &deviceCallback)
@@ -167,13 +168,14 @@ void AsyncDeviceReaderWorker::Execute()
 
     dc_context_t *context;
     status = dc_context_new(&context);
-    dc_context_set_loglevel(context, this->context->getNativeLogLevel()); //this->context->getNativeLogLevel());
+    dc_context_set_loglevel(context, this->context->getNativeLogLevel());
     dc_context_set_logfunc(
         context, [](dc_context_t *context, dc_loglevel_t loglevel, const char *file, unsigned int line, const char *function, const char *message, void *userdata)
         {
             auto devicereader = (AsyncDeviceReaderWorker *)userdata;
             auto logdata = new Logdata(loglevel, message);
-            devicereader->tsfLogdata.BlockingCall(logdata, callWithLogdata);
+            auto wrappedData = new WrappedData<Errorable, Logdata>(devicereader, logdata);
+            devicereader->tsfLogdata.BlockingCall(wrappedData, callWithLogdata);
         },
         this);
 
@@ -189,14 +191,24 @@ void AsyncDeviceReaderWorker::Execute()
         setDeviceFingerprint(device, fingerprint);
     }
 
-    tsfDevicedata.BlockingCall(device, callWithDevicedata);
+    auto wrappedDeviceData = new WrappedData<Errorable, dc_device_t>(this, device);
+    tsfDevicedata.BlockingCall(wrappedDeviceData, callWithDevicedata);
 
     dc_device_set_events(
         device, events, [](dc_device_t *d, dc_event_type_t event, const void *data, void *userdata)
         {
             auto devicereader = (AsyncDeviceReaderWorker *)userdata;
-            auto divedata = new Eventdata(event, data);
-            devicereader->tsfEventdata.BlockingCall(divedata, callWithEventdata);
+            auto eventdata = new Eventdata(event, data);
+            auto wrappedData = new WrappedData<Errorable, Eventdata>(devicereader, eventdata);
+            devicereader->tsfEventdata.BlockingCall(wrappedData, callWithEventdata);
+        },
+        this);
+
+    dc_device_set_cancel(
+        device, [](void *userdata)
+        {
+            auto worker = (AsyncDeviceReaderWorker *)userdata;
+            return worker->isCancelled ? 1 : 0;
         },
         this);
 
@@ -205,7 +217,8 @@ void AsyncDeviceReaderWorker::Execute()
         {
             auto devicereader = (AsyncDeviceReaderWorker *)userdata;
             auto divedata = new Divedata(data, size, fingerprint, fsize);
-            devicereader->tsfDivedata.BlockingCall(divedata, callWithDivedata);
+            auto wrappedData = new WrappedData<Errorable, Divedata>(devicereader, divedata);
+            devicereader->tsfDivedata.BlockingCall(wrappedData, callWithDivedata);
 
             return 1;
         },
@@ -227,36 +240,65 @@ void AsyncDeviceReaderWorker::setFingerprint(const unsigned char *fpdata, unsign
     }
 }
 
-void AsyncDeviceReaderWorker::callWithDivedata(Napi::Env env, Napi::Function jsCallback, Divedata *data)
+void AsyncDeviceReaderWorker::setError(const Napi::Error &error)
 {
-    auto diveDataBuffer = Napi::Buffer<unsigned char>::Copy(env, data->divedata, data->divedatasize);
-    auto fingerprintBuffer = Napi::Buffer<unsigned char>::Copy(env, data->fingerprint, data->fingerprintsize);
+    auto message = error.Message();
+    this->SetError(message);
+    cancel();
+}
 
-    jsCallback.Call({diveDataBuffer, fingerprintBuffer});
+void AsyncDeviceReaderWorker::cancel()
+{
+    isCancelled = true;
+}
+
+void AsyncDeviceReaderWorker::callWithDivedata(Napi::Env env, Napi::Function jsCallback, WrappedData<Errorable, Divedata> *data)
+{
+    auto diveDataBuffer = Napi::Buffer<unsigned char>::Copy(env, data->Data()->divedata, data->Data()->divedatasize);
+    auto fingerprintBuffer = Napi::Buffer<unsigned char>::Copy(env, data->Data()->fingerprint, data->Data()->fingerprintsize);
+
+    HANDLE_NAPI_WITH_ERRORABLE(
+        {
+            jsCallback.Call({diveDataBuffer, fingerprintBuffer});
+        },
+        data->Wrap());
 
     delete data;
 }
 
-void AsyncDeviceReaderWorker::callWithEventdata(Napi::Env env, Napi::Function jsCallback, Eventdata *data)
+void AsyncDeviceReaderWorker::callWithEventdata(Napi::Env env, Napi::Function jsCallback, WrappedData<Errorable, Eventdata> *data)
 {
-    auto value = wrapEvent(env, data->event, data->data);
-    jsCallback.Call({value});
+    auto value = wrapEvent(env, data->Data()->event, data->Data()->data);
+    HANDLE_NAPI_WITH_ERRORABLE(
+        {
+            jsCallback.Call({value});
+        },
+        data->Wrap());
 
     delete data;
 }
 
-void AsyncDeviceReaderWorker::callWithLogdata(Napi::Env env, Napi::Function jsCallback, Logdata *data)
+void AsyncDeviceReaderWorker::callWithLogdata(Napi::Env env, Napi::Function jsCallback, WrappedData<Errorable, Logdata> *data)
 {
-    jsCallback.Call({
-        translateLogLevel(env, data->loglevel),
-        Napi::String::New(env, data->message),
-    });
+    HANDLE_NAPI_WITH_ERRORABLE(
+        {
+            jsCallback.Call({
+                translateLogLevel(env, data->Data()->loglevel),
+                Napi::String::New(env, data->Data()->message),
+            });
+        },
+        data->Wrap());
 
     delete data;
 }
 
-void AsyncDeviceReaderWorker::callWithDevicedata(Napi::Env env, Napi::Function jsCallback, dc_device_t *data)
+void AsyncDeviceReaderWorker::callWithDevicedata(Napi::Env env, Napi::Function jsCallback, WrappedData<Errorable, dc_device_t> *data)
 {
-    auto device = Device::constructor.New({Napi::External<dc_device_t>::New(env, data)});
-    jsCallback.Call({device});
+    auto device = Device::constructor.New({Napi::External<dc_device_t>::New(env, data->Data())});
+
+    HANDLE_NAPI_WITH_ERRORABLE(
+        {
+            jsCallback.Call({device});
+        },
+        data->Wrap());
 }
