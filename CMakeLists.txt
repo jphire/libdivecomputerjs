@@ -19,10 +19,11 @@ target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} divecomputer)
 
 
 IF(WIN32)
+    get_target_property(bin_dir divecomputer BIN_FILES)
     add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_FILE:divecomputer>
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${bin_dir}
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 ENDIF()
