@@ -12,7 +12,7 @@ IF(WIN32)
     add_custom_target(libdivecomputer)
     add_library(divecomputer SHARED IMPORTED)
     add_custom_command(
-        TARGET divecomputer PRE_BUILD
+        TARGET libdivecomputer PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/dev/include
         ${CMAKE_SOURCE_DIR}/deps/include
