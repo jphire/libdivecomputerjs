@@ -1,9 +1,17 @@
 {
   "name": "libdivecomputerjs",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "main": "index.js",
   "license": "MIT",
   "types": "index.d.ts",
+  "homepage": "https://github.com/blackshadev/libdivecomputerjs",
+  "bugs": {
+    "url": "https://github.com/blackshadev/libdivecomputerjs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blackshadev/libdivecomputerjs.git"
+  },
   "scripts": {
     "configure": "cmake-js configure",
     "install": "cmake-js compile",
