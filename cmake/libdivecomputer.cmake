@@ -24,4 +24,4 @@ IF(WIN32)
 ENDIF()
 
 include_directories(${CMAKE_SOURCE_DIR}/deps/include)
-link_directories(${CMAKE_SOURCE_DIR}/deps/lib)
+link_directories(./deps/lib)

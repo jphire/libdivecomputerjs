@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.9)
 cmake_policy(SET CMP0042 NEW)
+cmake_policy(SET CMP0015 NEW)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set (CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
 
 project (libdivecomputerjs)
 
@@ -15,7 +17,9 @@ include_directories(${CMAKE_JS_INC})
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 add_dependencies(${PROJECT_NAME} libdivecomputer)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
+set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-rpath,./deps/lib")
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} divecomputer)
+
 
 
 IF(WIN32)
