@@ -4,26 +4,33 @@ cmake_policy(SET CMP0015 NEW)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-set (CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
+
+# set(CMAKE_SKIP_RPATH TRUE CACHE BOOL "If set, runtime paths are not added when using shared libraries.")
+set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
+
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 project (libdivecomputerjs)
 
-include(cmake/libdivecomputer.cmake)
-
 file(GLOB_RECURSE SOURCE_FILES src/*.cc)
 
-set_directory_properties(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/deps)
 include_directories(${CMAKE_JS_INC})
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
-add_dependencies(${PROJECT_NAME} libdivecomputer)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
-set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-Wl,-rpath,./deps/lib")
-target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} divecomputer)
 
+find_package(DiveComputer REQUIRED)
 
+target_include_directories(${PROJECT_NAME} PRIVATE "${LIBDIVECOMPUTER_INCLUDE_DIR}")
+link_directories(./lib)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} DiveComputer)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        BUILD_WITH_INSTALL_RPATH FALSE
+        LINK_FLAGS "-Wl,-rpath,$ORIGIN/lib")
 
 IF(WIN32)
-    get_target_property(bin_dir divecomputer BIN_FILES)
+    get_target_property(bin_dir DiveComputer BIN_FILES)
+    target_link_libraries(${PROJECT_NAME} DiveComputer)
     add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
