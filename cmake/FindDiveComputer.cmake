@@ -15,17 +15,24 @@ IF(NOT WIN32)
         BUILD_IN_SOURCE TRUE
     )
 
-    # add_custom_command(
-    #     TARGET DownloadLibDiveComputer PRE_LINK
-    #     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    #     ${CMAKE_BINARY_DIR}/lib
-    #     ${CMAKE_BINARY_DIR}
-    # )
+    add_custom_command(
+        TARGET DownloadLibDiveComputer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rm -f
+        ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so.0
+        ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so
+    )
+    add_custom_command(
+        TARGET DownloadLibDiveComputer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rename
+        ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so.0.0.0
+        ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so.0
+    )
     add_dependencies(DiveComputer DownloadLibDiveComputer)
     set_target_properties(
         DiveComputer
         PROPERTIES
-            IMPORTED_LOCATION "./lib/libdivecomputer.so"
+            IMPORTED_LOCATION "./lib/libdivecomputer.so.0"
+            
         )
 ENDIF()
 
