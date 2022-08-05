@@ -24,17 +24,18 @@ find_package(DiveComputer REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE "${LIBDIVECOMPUTER_INCLUDE_DIR}")
 link_directories(./lib)
 target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} DiveComputer)
-set_target_properties(${PROJECT_NAME} PROPERTIES
-        BUILD_WITH_INSTALL_RPATH FALSE
-        LINK_FLAGS "-Wl,-rpath,$ORIGIN/lib")
+
+IF(NOT WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+            BUILD_WITH_INSTALL_RPATH FALSE
+            LINK_FLAGS "-Wl,-rpath,$ORIGIN/lib")
+ENDIF()
 
 IF(WIN32)
-    get_target_property(bin_dir DiveComputer BIN_FILES)
-    target_link_libraries(${PROJECT_NAME} DiveComputer)
     add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${bin_dir}
+        ${LIBDIVECOMPUTER_LIBRARY}
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 ENDIF()

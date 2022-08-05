@@ -65,7 +65,7 @@ describe('Parser', () => {
         });
 
         it('Field Tank', () => {
-            expect(parser.getField(FieldType.Tank)).to.deep.equals(
+            expect(parser.getField(FieldType.Tank, 0)).to.deep.equals(
                 referenceData.tank
             );
         });
@@ -77,7 +77,7 @@ describe('Parser', () => {
         });
 
         it('Field Gasmix', () => {
-            expect(parser.getField(FieldType.GasMix)).to.deep.equals(
+            expect(parser.getField(FieldType.GasMix, 0)).to.deep.equals(
                 referenceData.gasmix
             );
         });
