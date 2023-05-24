@@ -10,13 +10,13 @@ As an example see `test/download-eonsteel.ts` as a reference.
 
 -   `cmake`
 -    autoconf
--    build-essentials
+-    build-essential
 -    pkg-config
 -   `libusb`
 -   `libhidapi`
 -   `BlueZ`
 
-For ubuntu run `sudo apt install libusb-1.0-0 libhidapi-libusb0 libbluetooth3 build-essentials autoconf pkg-config cmake`
+For ubuntu run `sudo apt install libusb-1.0-0 libhidapi-libusb0 libbluetooth3 build-essential autoconf pkg-config cmake`
 
 ## Installation
 
