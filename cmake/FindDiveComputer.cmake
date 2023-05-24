@@ -9,7 +9,7 @@ add_library(DiveComputer SHARED IMPORTED)
 IF(NOT WIN32)
     include(ExternalProject)
     ExternalProject_Add(SetupLibDiveComputer
-        URL https://github.com/libdivecomputer/libdivecomputer/archive/refs/heads/master.zip
+        URL https://github.com/libdivecomputer/libdivecomputer/archive/refs/tags/v0.7.0.zip
         CONFIGURE_COMMAND autoreconf --install && ./configure --prefix=${CMAKE_BINARY_DIR}
         BUILD_IN_SOURCE TRUE
     )
