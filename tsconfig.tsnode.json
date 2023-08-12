@@ -4,7 +4,8 @@
       "files": true
     },
     "files": [
-      "typings/asserttypes.d.ts"
+      "typings/asserttypes.d.ts",
+      "index.d.ts",
     ],
     "compilerOptions":{
         "target": "es2020",

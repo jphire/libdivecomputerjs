@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Context, Descriptor, FieldType, Parser } from 'libdivecomputerjs';
+import { Context, Descriptor, DiveMode, FieldType, Parser } from 'libdivecomputerjs';
 import { readFileSync } from 'fs';
 import { getEonSteel } from '../examples/helpers/descriptors';
 import { unbundleDiveData } from '../examples/helpers/parser';
@@ -93,7 +93,7 @@ describe('Parser', () => {
         });
 
         it('Field DiveMode', () => {
-            expect(parser.getField(FieldType.DiveMode)).to.be.undefined;
+            expect(parser.getField(FieldType.DiveMode)).to.equals(DiveMode.OpenCircuit);
         });
 
         it('Field Salinity', () => {
