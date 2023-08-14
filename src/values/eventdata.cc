@@ -44,7 +44,6 @@ Napi::Value wrapVendorEventData(Napi::Env env, const dc_event_vendor_t *vendor)
 Napi::Value wrapDevInfoEventData(Napi::Env env, dc_event_devinfo_t *devinfo)
 {
     auto progressObject = Napi::Object::New(env);
-    printf("fw: %u, ser: %u, mod: %u \n", devinfo->firmware, devinfo->serial, devinfo->model);
 
     progressObject.Set("firmware", devinfo->firmware);
     progressObject.Set("model", devinfo->model);
