@@ -270,7 +270,7 @@ Napi::Object wrapDecoSample(Napi::Env env, dc_sample_value_t value)
     auto deco = Napi::Object::New(env);
     deco.Set("depth", value.deco.depth);
     deco.Set("time", value.deco.time);
-    deco.Set("type", value.deco.type);
+    deco.Set("type", translateDecoType(env, value.deco.type));
     return deco;
 }
 

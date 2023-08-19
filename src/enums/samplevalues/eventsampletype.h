@@ -28,5 +28,11 @@
 #define SAMPLE_EVENT_TYPE_TISSUE_LEVEL_WARNING "TissueLevelWarning"
 #define SAMPLE_EVENT_TYPE_GASCHANGE2 "Gaschange2"
 
+#define DECO_TYPE_NDL "No Decompression Limit"
+#define DECO_TYPE_SAFETYSTOP "Safety Stop"
+#define DECO_TYPE_DECOSTOP "Decompression Stop"
+#define DECO_TYPE_DEEPSTOP "Deep Decompression Stop"
+
 const char *translateSampleEventType(Napi::Env env, unsigned int type);
+const char *translateDecoType(Napi::Env env, unsigned int type);
 Napi::Object getAllSampleEventTypes(Napi::Env env);

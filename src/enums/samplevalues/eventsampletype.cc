@@ -31,6 +31,27 @@ const char *event_type_names[EVENT_TYPE_COUNT] = {
     SAMPLE_EVENT_TYPE_GASCHANGE2,
 };
 
+#define DECO_TYPE_COUNT 4
+const char *deco_type_names[EVENT_TYPE_COUNT] = {
+    DECO_TYPE_NDL,
+    DECO_TYPE_SAFETYSTOP,
+    DECO_TYPE_DECOSTOP,
+    DECO_TYPE_DEEPSTOP,
+};
+
+const char *translateDecoType(Napi::Env env, unsigned int type) 
+{
+    if (type < 0 || type >= DECO_TYPE_COUNT - 1)
+    {
+        char buff[128];
+        snprintf(buff, 128, "Invalid deco sample type %u", type);
+        throw Napi::TypeError::New(env, buff);
+    }
+
+    return deco_type_names[type];
+
+}
+
 const char *translateSampleEventType(Napi::Env env, unsigned int type)
 {
     if (type < 0 || type >= EVENT_TYPE_COUNT - 1)

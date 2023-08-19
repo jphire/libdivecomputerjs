@@ -15,7 +15,6 @@ IF(NOT WIN32)
     add_custom_command(
         TARGET SetupLibDiveComputer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E rm -f
-        ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so.0
         ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so
     )
     add_custom_command(
@@ -27,7 +26,7 @@ IF(NOT WIN32)
     set_target_properties(
         DiveComputer
         PROPERTIES
-            IMPORTED_LOCATION "./lib/libdivecomputer.so.0"
+            IMPORTED_LOCATION ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so.0
             
         )
 ENDIF()
