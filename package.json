@@ -13,9 +13,9 @@
     "url": "https://github.com/blackshadev/libdivecomputerjs.git"
   },
   "scripts": {
-    "configure": "cmake-js configure",
-    "install": "cmake-js compile",
-    "build": "cmake-js build",
+    "configure": "cmake-js -G 'Unix Makefiles' configure",
+    "install": "cmake-js -G 'Unix Makefiles' compile",
+    "build": "cmake-js -G 'Unix Makefiles' build",
     "test": "mocha --require ./tshook.js --recursive  test/*.spec.ts test/**/*.spec.ts",
     "sample": "yarn configure && yarn build && ts-node examples/download-eonsteel.ts",
     "all": "yarn configure && yarn build && yarn test",
