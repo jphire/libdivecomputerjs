@@ -1,5 +1,3 @@
-const SegfaultHandler = require('segfault-handler');
-SegfaultHandler.registerHandler('crash.log');
 import {
     Context,
     Device,

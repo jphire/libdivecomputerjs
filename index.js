@@ -1,2 +1,2 @@
-var libdivecomputer = require('bindings')('libdivecomputerjs.node');
+var libdivecomputer = require('libdivecomputerjs.node');
 module.exports = libdivecomputer;
