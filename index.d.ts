@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer/';
+
 declare module 'libdivecomputerjs' {
     export enum LogLevel {
         None = 'None',

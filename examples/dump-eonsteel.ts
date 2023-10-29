@@ -7,8 +7,9 @@ import {
     version,
 } from 'libdivecomputerjs';
 import { getEonSteel } from './helpers/descriptors';
-import fs from 'fs';
+import fs from 'react-native-level-fs';
 import { bundleDiveData } from './helpers/parser';
+import { Buffer } from 'buffer/';
 
 const DUMPS_DIR = './dumps';
 if (!fs.existsSync(DUMPS_DIR)) {
@@ -18,7 +19,7 @@ if (!fs.existsSync(DUMPS_DIR)) {
 console.log(`libdivecomputer v${version()}`);
 
 const context = new Context();
-context.onLog((lvl, msg) => {
+context.onLog((lvl: number, msg: string) => {
     console.log(`[Log][${lvl}]: ${msg}`);
 });
 context.logLevel = LogLevel.Warning;
@@ -28,17 +29,17 @@ if (eonSteel === undefined) {
     throw new Error('No Eonsteel descriptor found');
 }
 
-const usbhid = Array.from(USBHIDTransport.iterate(context, eonSteel))[0];
+const usbhid: USBHIDTransport = Array.from(USBHIDTransport.iterate(context, eonSteel))[0];
 
 if (usbhid === undefined) {
     throw new Error('No EonSteel USBHID device found');
 }
 
-console.log(`Found device ${usbhid.toString()}`);
+console.log(`Found device ${usbhid?.toString()}`);
 
-const iostream = usbhid.open(context);
+const iostream = usbhid ? usbhid.open(context) : undefined;
 
-let deviceClock = {
+let deviceClock: { devtime: number, systime: bigint} = {
     devtime: 0,
     systime: 0n,
 };
@@ -51,7 +52,7 @@ const allEvents = [
     EventType.Vendor,
     EventType.Waiting,
 ];
-device.setEvents(allEvents, (event) => {
+device.setEvents(allEvents, (event: EventType) => {
     console.log(event);
 
     if (event.type === EventType.Clock) {
@@ -67,7 +68,7 @@ device.foreach((diveData: Buffer, fingerprint: Buffer) => {
     const bundledData = bundleDiveData(
         diveData,
         deviceClock.devtime,
-        deviceClock.systime
+        deviceClock.systime.valueOf()
     );
 
     fs.writeFileSync(`${DUMPS_DIR}/${filename}.bin`, bundledData);
