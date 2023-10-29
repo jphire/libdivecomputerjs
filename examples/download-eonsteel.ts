@@ -7,7 +7,7 @@ import {
     version,
 } from 'libdivecomputerjs';
 import { getEonSteel } from './helpers/descriptors';
-import fs from 'fs';
+import fs from 'react-native-level-fs';
 
 const OUTPUTS_DIR = './outputs';
 if (!fs.existsSync(OUTPUTS_DIR)) {
@@ -17,7 +17,7 @@ if (!fs.existsSync(OUTPUTS_DIR)) {
 console.log(`libdivecomputer v${version()}`);
 
 const context = new Context();
-context.onLog((lvl, msg) => {
+context.onLog((lvl: number, msg: string) => {
     console.log(`[CTX][Log][${lvl}]: ${msg}`);
 });
 context.logLevel = LogLevel.Warning;
@@ -28,7 +28,7 @@ if (eonSteel === undefined) {
     throw new Error('No Eonsteel descriptor found');
 }
 
-const usbhid = Array.from(USBHIDTransport.iterate(context, eonSteel))[0];
+const usbhid: USBHIDTransport = Array.from(USBHIDTransport.iterate(context, eonSteel))[0];
 
 if (usbhid === undefined) {
     throw new Error('No EonSteel USBHID device found');

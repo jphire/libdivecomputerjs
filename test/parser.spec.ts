@@ -1,8 +1,9 @@
 import { expect } from 'chai';
 import { Context, Descriptor, DiveMode, FieldType, Parser } from 'libdivecomputerjs';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'react-native-level-fs';
 import { getEonSteel } from '../examples/helpers/descriptors';
 import { unbundleDiveData } from '../examples/helpers/parser';
+import { Buffer } from 'buffer/';
 
 describe('Parser', () => {
     let context: Context;
@@ -14,7 +15,7 @@ describe('Parser', () => {
     const referenceData = require('./data/SuuntoEONSteelReference.json');
 
     before(() => {
-        let bundledData = readFileSync(
+        let bundledData: Buffer = readFileSync(
             __dirname + '/data/SuuntoEONSteelDump.bin'
         );
         const obj = unbundleDiveData(bundledData);

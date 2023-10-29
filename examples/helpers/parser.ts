@@ -1,8 +1,10 @@
+import { Buffer } from 'buffer/';
+
 export function unbundleDiveData(
     bundledData: Buffer
 ): { devtime: number; systime: bigint; diveData: Buffer } {
     const devtime = bundledData.readUInt32BE(0);
-    const systime = bundledData.readBigInt64BE(4);
+    const systime = bundledData.readBigInt64BE(4).valueOf();
 
     return { devtime, systime, diveData: bundledData.slice(12) };
 }
@@ -15,7 +17,7 @@ export function bundleDiveData(
     const biggerBuffer = Buffer.allocUnsafe(diveData.length + 4 + 8);
 
     biggerBuffer.writeUInt32BE(devtime, 0);
-    biggerBuffer.writeBigInt64BE(systime, 4);
+    biggerBuffer.writeBigInt64BE(Number(systime), 4);
     diveData.copy(biggerBuffer, 12);
 
     return biggerBuffer;
