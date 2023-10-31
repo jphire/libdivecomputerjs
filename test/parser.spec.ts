@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Context, Descriptor, DiveMode, FieldType, Parser } from 'libdivecomputerjs';
-import { readFileSync } from 'react-native-level-fs';
+import { readFileSync } from 'react-native-fs';
 import { getEonSteel } from '../examples/helpers/descriptors';
 import { unbundleDiveData } from '../examples/helpers/parser';
 import { Buffer } from 'buffer/';

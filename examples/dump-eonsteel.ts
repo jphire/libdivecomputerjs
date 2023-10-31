@@ -7,7 +7,7 @@ import {
     version,
 } from 'libdivecomputerjs';
 import { getEonSteel } from './helpers/descriptors';
-import fs from 'react-native-level-fs';
+import fs from 'react-native-fs';
 import { bundleDiveData } from './helpers/parser';
 import { Buffer } from 'buffer/';
 

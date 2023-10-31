@@ -38,7 +38,8 @@ Napi::Value wrapProgressEventData(Napi::Env env, const dc_event_progress_t *prog
 
 Napi::Value wrapVendorEventData(Napi::Env env, const dc_event_vendor_t *vendor)
 {
-    return Napi::ArrayBuffer::New(env, const_cast<unsigned char *>(vendor->data), vendor->size);
+    // TODO: check if arraybuffer needs to be changed to Blob
+    return Napi::Uint8Array::New(env, vendor->size, Napi::ArrayBuffer::New(env, const_cast<unsigned char *>(vendor->data), vendor->size), 0);
 }
 
 Napi::Value wrapDevInfoEventData(Napi::Env env, dc_event_devinfo_t *devinfo)
