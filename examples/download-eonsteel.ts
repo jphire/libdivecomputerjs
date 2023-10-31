@@ -7,7 +7,7 @@ import {
     version,
 } from 'libdivecomputerjs';
 import { getEonSteel } from './helpers/descriptors';
-import fs from 'react-native-level-fs';
+import fs from 'react-native-fs';
 
 const OUTPUTS_DIR = './outputs';
 if (!fs.existsSync(OUTPUTS_DIR)) {

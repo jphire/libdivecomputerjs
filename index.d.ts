@@ -245,7 +245,7 @@ declare module 'libdivecomputerjs' {
               | SampleType.Time,
               number
           >
-        | SampleInstance<SampleType.Vendor, { type: number; data: ArrayBuffer }>
+        | SampleInstance<SampleType.Vendor, { type: number; data: Uint8Array }>
         | SampleInstance<SampleType.Pressure, { tank: number; value: number }>
         | SampleInstance<
               SampleType.Deco,
