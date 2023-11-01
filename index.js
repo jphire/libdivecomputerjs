@@ -1,3 +1,3 @@
 global.Buffer = require('buffer/').Buffer;
-var libdivecomputer = require('bindings')('libdivecomputerjs.node');
+var libdivecomputer = require('./build/libdivecomputerjs.node');
 module.exports = libdivecomputer;
