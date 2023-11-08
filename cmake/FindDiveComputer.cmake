@@ -2,7 +2,7 @@ include(GNUInstallDirs)
 
 add_library(DiveComputer SHARED IMPORTED)
 
-IF(NOT WIN32)
+IF(ANDROID OR LINUX)
     include(ExternalProject)
     ExternalProject_Add(SetupLibDiveComputer
         URL https://github.com/libdivecomputer/libdivecomputer/releases/download/v0.8.0/libdivecomputer-0.8.0.tar.gz
@@ -29,9 +29,28 @@ IF(NOT WIN32)
         PROPERTIES
             IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libdivecomputer.so.0
         )
-ENDIF()
+ELSEIF(APPLE)
+    include(ExternalProject)
+    ExternalProject_Add(SetupLibDiveComputer
+        URL https://github.com/libdivecomputer/libdivecomputer/releases/download/v0.8.0/libdivecomputer-0.8.0.tar.gz
+        CONFIGURE_COMMAND autoreconf --install && ./configure --prefix=${CMAKE_BINARY_DIR}
+        BUILD_IN_SOURCE TRUE
+    )
+    set (LIBDIVECOMPUTER_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
+    set (LIBDIVECOMPUTER_LIBRARY ${CMAKE_BINARY_DIR}/lib)
 
-IF(WIN32)
+    add_custom_command(
+        TARGET SetupLibDiveComputer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rm -f
+        ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.dylib
+    )
+    set_target_properties(
+        DiveComputer
+        PROPERTIES
+            IMPORTED_LOCATION ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.0.dylib
+
+    )
+ELSEIF(WIN32)
 
     set (LIBDIVECOMPUTER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dev/include)
     set (LIBDIVECOMPUTER_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/dev/bin)
