@@ -80,7 +80,7 @@ declare module 'libdivecomputerjs' {
                 | USBHIDTransport
                 | SerialTransport
                 | IRDATransport
-                | BluetoothTranport
+                | BluetoothTransport
         ): void;
         onEvents(events: EventType[], callback: EventCallback): void;
         onDive(callback: (diveData: Buffer, fingerprint: Buffer) => void): void;
@@ -177,11 +177,11 @@ declare module 'libdivecomputerjs' {
         toString(): string;
     }
 
-    export class BluetoothTranport {
+    export class BluetoothTransport {
         static iterate(
             context: Context,
             descriptor: Descriptor
-        ): Iterable<BluetoothTranport>;
+        ): Iterable<BluetoothTransport>;
         readonly name: string;
         open(context: Context): IOStream;
         toString(): string;
