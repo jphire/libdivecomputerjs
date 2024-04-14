@@ -8,6 +8,7 @@ IF(NOT WIN32)
         URL https://github.com/libdivecomputer/libdivecomputer/releases/download/v0.8.0/libdivecomputer-0.8.0.tar.gz
         CONFIGURE_COMMAND autoreconf --install && ./configure --prefix=${CMAKE_BINARY_DIR}
         BUILD_IN_SOURCE TRUE
+        BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/lib/libdivecomputer.so.0 ${CMAKE_BINARY_DIR}/lib/libdivecomputer.so
     )
     set (LIBDIVECOMPUTER_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
     set (LIBDIVECOMPUTER_LIBRARY ${CMAKE_BINARY_DIR}/lib)
@@ -26,8 +27,7 @@ IF(NOT WIN32)
     set_target_properties(
         DiveComputer
         PROPERTIES
-            IMPORTED_LOCATION ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so.0
-            
+            IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libdivecomputer.so.0
         )
 ENDIF()
 
