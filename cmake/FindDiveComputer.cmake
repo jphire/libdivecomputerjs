@@ -15,7 +15,7 @@ IF(ANDROID OR LINUX)
 
     add_custom_command(
         TARGET SetupLibDiveComputer POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E rm -f
+        COMMAND ${CMAKE_COMMAND} -E remove -f
         ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.so
     )
     add_custom_command(
