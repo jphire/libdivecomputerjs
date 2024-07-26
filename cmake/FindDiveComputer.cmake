@@ -28,11 +28,12 @@ IF(ANDROID OR LINUX)
         DiveComputer
         PROPERTIES
             IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libdivecomputer.so.0
-        )
+    )
 ELSEIF(APPLE)
     include(ExternalProject)
     ExternalProject_Add(SetupLibDiveComputer
         URL https://github.com/libdivecomputer/libdivecomputer/releases/download/v0.8.0/libdivecomputer-0.8.0.tar.gz
+        # URL https://github.com/libdivecomputer/libdivecomputer/archive/refs/heads/master.zip
         CONFIGURE_COMMAND autoreconf --install && ./configure --prefix=${CMAKE_BINARY_DIR}
         BUILD_IN_SOURCE TRUE
     )
@@ -48,7 +49,6 @@ ELSEIF(APPLE)
         DiveComputer
         PROPERTIES
             IMPORTED_LOCATION ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.0.dylib
-
     )
 ELSEIF(WIN32)
 
