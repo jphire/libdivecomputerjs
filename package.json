@@ -18,8 +18,9 @@
   "scripts": {
     "configure": "cmake-js -G \"Unix Makefiles\" configure",
     "install": "cmake-js -G \"Unix Makefiles\" compile",
+    "install-linux": "cmake-js -G \"Unix Makefiles\" compile",
     "install-mac": "cmake-js -G \"Xcode\" --CDCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=FLPZ2FX2N2 compile",
-    "install-ios": "cmake-js -G \"Xcode\" --CDCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=FLPZ2FX2N2 --CDCMAKE_SYSTEM_NAME=iOS --CDCMAKE_OSX_DEPLOYMENT_TARGET=\"13.4\" --CDCMAKE_HOST_SYSTEM_PROCESSOR=arm64 compile",
+    "install": "cmake-js -G \"Xcode\" --CDCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=FLPZ2FX2N2 --CDCMAKE_SYSTEM_NAME=iOS --CDCMAKE_OSX_DEPLOYMENT_TARGET=\"13.4\" --CDCMAKE_HOST_SYSTEM_PROCESSOR=arm64 compile",
     "build": "cmake-js -G \"Unix Makefiles\" build",
     "test": "mocha --require ./tshook.js --recursive  test/*.spec.ts test/**/*.spec.ts",
     "sample": "yarn configure && yarn build && ts-node examples/download-eonsteel.ts",
