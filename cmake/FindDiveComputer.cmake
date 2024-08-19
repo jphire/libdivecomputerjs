@@ -29,7 +29,42 @@ IF(ANDROID OR LINUX)
         PROPERTIES
             IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libdivecomputer.so.0
     )
+ELSEIF(IOS)
+    include(ExternalProject)
+    ExternalProject_Add(SetupLibDiveComputer
+        URL https://github.com/libdivecomputer/libdivecomputer/releases/download/v0.8.0/libdivecomputer-0.8.0.tar.gz
+        # URL https://github.com/libdivecomputer/libdivecomputer/archive/refs/heads/master.zip
+        # CONFIGURE_COMMAND autoreconf --install && ./configure --prefix=${CMAKE_BINARY_DIR}
+        CONFIGURE_COMMAND autoreconf --install && ./configure --host=arm64-apple-ios --prefix=${CMAKE_BINARY_DIR} --enable-static --disable-shared --enable-examples=no --without-libusb --without-hidapi
+        BUILD_IN_SOURCE TRUE
+    )
+    set (LIBDIVECOMPUTER_INCLUDE_DIR ${CMAKE_BINARY_DIR}/include)
+    set (LIBDIVECOMPUTER_LIBRARY ${CMAKE_BINARY_DIR}/lib)
+
+    add_custom_command(
+        TARGET SetupLibDiveComputer POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rm -f
+        ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.dylib
+    )
+    set_target_properties(
+        DiveComputer
+        PROPERTIES
+            IMPORTED_LOCATION ${LIBDIVECOMPUTER_LIBRARY}/libdivecomputer.a
+    )
 ELSEIF(APPLE)
+    # set(triple arm64-apple-ios)
+
+    # set(CMAKE_C_COMPILER clang)
+    # set(CMAKE_C_COMPILER_TARGET ${triple})
+    # set(CMAKE_CXX_COMPILER clang++)
+    # set(CMAKE_CXX_COMPILER_TARGET ${triple})
+    
+    # set (CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+    # set (CMAKE_OSX_ARCHITECTURES arm64)
+    # set (CMAKE_C_COMPILER clang) #$(xcrun --find --sdk "iphoneos" clang))
+    # set (CMAKE_CXX_COMPILER clang++) #$(xcrun --find --sdk "iphoneos" clang++))
+    # set (CMAKE_CPP_COMPILER cpp) #$(xcrun --find --sdk "iphoneos" cpp))
+
     include(ExternalProject)
     ExternalProject_Add(SetupLibDiveComputer
         URL https://github.com/libdivecomputer/libdivecomputer/releases/download/v0.8.0/libdivecomputer-0.8.0.tar.gz
